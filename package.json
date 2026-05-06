@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "generate-placeholders": "node scripts/generate-placeholders.js"
   },
   "dependencies": {
     "expo": "~51.0.0",

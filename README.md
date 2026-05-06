@@ -26,9 +26,13 @@ Add your local `.env` (already exists, edit API URL if needed):
 EXPO_PUBLIC_API_URL=http://localhost:8080/api/v1
 ```
 
-Add the required static image assets to `assets/images/`:
-- `splash.png` — hero background image for the onboarding screen
-- `logo.png` — Hydra wordmark
+### Image assets
+Before running the app, generate placeholder images (or replace with real ones):
+```bash
+npm run generate-placeholders
+```
+Then replace assets/images/splash.png with a real hero photo and
+assets/images/logo.png with the Hydra wordmark.
 
 Run the app:
 ```bash

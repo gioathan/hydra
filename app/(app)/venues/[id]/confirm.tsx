@@ -6,7 +6,6 @@ import {
   StyleSheet,
   SafeAreaView,
   Pressable,
-  TextInput,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useMutation, useQuery } from '@tanstack/react-query';

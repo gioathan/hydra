@@ -5,6 +5,14 @@ import { useAuthStore } from './store/authStore';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
 
+if (!process.env.EXPO_PUBLIC_API_URL && __DEV__) {
+  console.warn(
+    '[Hydra] EXPO_PUBLIC_API_URL is not set in .env. ' +
+    'Falling back to localhost which will NOT work on a physical device. ' +
+    'Create a .env file with your machine\'s local network IP.'
+  );
+}
+
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
