@@ -56,7 +56,8 @@ export default function BookingsScreen() {
     () =>
       allBookings
         .filter((b) => {
-          if (b.status === 'Pending' || b.status === 'Confirmed') return true;
+          if (b.status === 'Pending') return !isBefore(parseISO(b.startUtc), now);
+          if (b.status === 'Confirmed') return !isBefore(parseISO(b.endUtc), now);
           return false;
         })
         .sort((a, b) => parseISO(a.startUtc).getTime() - parseISO(b.startUtc).getTime()),

@@ -11,15 +11,15 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { Colors } from '../../../constants/colors';
-import { VenuePlaceholder } from '../../../components/VenuePlaceholder';
-import { CalendarPicker } from '../../../components/CalendarPicker';
-import { PrimaryButton } from '../../../components/PrimaryButton';
-import { LoadingSpinner } from '../../../components/LoadingSpinner';
-import { getVenue, getAvailability } from '../../../lib/api/venues';
-import { getVenueTypes } from '../../../lib/api/venueTypes';
-import { formatDateParam } from '../../../lib/utils';
-import type { AvailabilitySlot } from '../../../types';
+import { Colors } from '../../../../constants/colors';
+import { VenuePlaceholder } from '../../../../components/VenuePlaceholder';
+import { CalendarPicker } from '../../../../components/CalendarPicker';
+import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { LoadingSpinner } from '../../../../components/LoadingSpinner';
+import { getVenue, getAvailability } from '../../../../lib/api/venues';
+import { getVenueTypes } from '../../../../lib/api/venueTypes';
+import { formatDateParam } from '../../../../lib/utils';
+import type { AvailabilitySlot } from '../../../../types';
 
 export default function VenueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
