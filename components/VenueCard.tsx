@@ -14,8 +14,8 @@ interface VenueCardProps {
 export function VenueCard({ venue, venueType, onPress, onBook }: VenueCardProps) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
-      {venue.photoUrl ? (
-        <Image source={{ uri: venue.photoUrl }} style={styles.image} resizeMode="cover" />
+      {venue.photos[0]?.photoUrl ? (
+        <Image source={{ uri: venue.photos[0].photoUrl }} style={styles.image} resizeMode="cover" />
       ) : (
         <VenuePlaceholder name={venue.name} height={180} />
       )}

@@ -14,6 +14,13 @@ export interface CustomerDto {
   pushToken: string | null;
 }
 
+export interface VenuePhotoDto {
+  id: string;
+  googlePlaceId: string | null;
+  displayOrder: number;
+  photoUrl: string | null;
+}
+
 export interface VenueDto {
   id: string;
   name: string;
@@ -21,8 +28,7 @@ export interface VenueDto {
   capacity: number;
   userId: string;
   venueTypeId: string;
-  googlePlaceId: string | null;
-  photoUrl: string | null;
+  photos: VenuePhotoDto[];
 }
 
 export interface VenueTypeDto {

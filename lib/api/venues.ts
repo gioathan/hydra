@@ -1,9 +1,13 @@
 import { apiClient } from '../api';
 import type { PagedResult, VenueDto, AvailabilityResponse } from '../../types';
 
-export async function getVenues(page = 1, pageSize = 25): Promise<PagedResult<VenueDto>> {
+export async function getVenues(
+  page = 1,
+  pageSize = 25,
+  venueTypeId?: string | null
+): Promise<PagedResult<VenueDto>> {
   const { data } = await apiClient.get<PagedResult<VenueDto>>('/venues', {
-    params: { page, pageSize },
+    params: { page, pageSize, ...(venueTypeId ? { venueTypeId } : {}) },
   });
   return data;
 }

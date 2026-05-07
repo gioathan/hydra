@@ -45,22 +45,17 @@ export default function HomeScreen() {
     refetch,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: ['venues'],
-    queryFn: ({ pageParam = 1 }) => getVenues(pageParam as number, PAGE_SIZE),
+    queryKey: ['venues', selectedTypeId],
+    queryFn: ({ pageParam = 1 }) => getVenues(pageParam as number, PAGE_SIZE, selectedTypeId),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
   });
 
-  const allVenues: VenueDto[] = useMemo(
+  const filteredVenues: VenueDto[] = useMemo(
     () => data?.pages.flatMap((p) => p.items) ?? [],
     [data]
   );
-
-  const filteredVenues = useMemo(() => {
-    if (!selectedTypeId) return allVenues;
-    return allVenues.filter((v) => v.venueTypeId === selectedTypeId);
-  }, [allVenues, selectedTypeId]);
 
   const typeMap = useMemo(
     () => new Map(venueTypes.map((t) => [t.id, t])),

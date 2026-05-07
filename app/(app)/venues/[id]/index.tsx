@@ -2,24 +2,21 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   SafeAreaView,
   Pressable,
-  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Colors } from '../../../../constants/colors';
-import { VenuePlaceholder } from '../../../../components/VenuePlaceholder';
+import { PhotoSlider } from '../../../../components/PhotoSlider';
 import { CalendarPicker } from '../../../../components/CalendarPicker';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { LoadingSpinner } from '../../../../components/LoadingSpinner';
 import { getVenue, getAvailability } from '../../../../lib/api/venues';
 import { getVenueTypes } from '../../../../lib/api/venueTypes';
 import { formatDateParam } from '../../../../lib/utils';
-import type { AvailabilitySlot } from '../../../../types';
 
 export default function VenueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -47,6 +44,10 @@ export default function VenueDetailScreen() {
     setAvailabilityError(null);
     try {
       const result = await getAvailability(venue.id, formatDateParam(selectedDate), partySize);
+      if (!result.isAvailable) {
+        setAvailabilityError(result.reason ?? 'No slots available for this selection.');
+        return;
+      }
       router.push({
         pathname: '/(app)/venues/[id]/slots',
         params: {
@@ -54,7 +55,7 @@ export default function VenueDetailScreen() {
           date: formatDateParam(selectedDate),
           partySize: String(partySize),
           slots: JSON.stringify(result.availableSlots),
-          isAvailable: result.isAvailable ? 'true' : 'false',
+          isAvailable: 'true',
           reason: result.reason,
           venueName: venue.name,
         },
@@ -87,12 +88,8 @@ export default function VenueDetailScreen() {
           <Text style={styles.backText}>‹</Text>
         </Pressable>
 
-        {/* Hero image */}
-        {venue.photoUrl ? (
-          <Image source={{ uri: venue.photoUrl }} style={styles.heroImage} resizeMode="cover" />
-        ) : (
-          <VenuePlaceholder name={venue.name} height={260} />
-        )}
+        {/* Hero image / slider */}
+        <PhotoSlider photos={venue.photos} name={venue.name} height={260} />
 
         <View style={styles.content}>
           {/* Venue info */}
@@ -198,10 +195,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: Colors.navy,
     lineHeight: 28,
-  },
-  heroImage: {
-    width: '100%',
-    height: 260,
   },
   content: {
     padding: 20,
