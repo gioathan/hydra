@@ -1,38 +1,65 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   FlatList,
   StyleSheet,
   SafeAreaView,
   RefreshControl,
+  Pressable,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
-import { FilterChip } from '../../components/FilterChip';
+import { T } from '../../constants/typography';
 import { VenueCard } from '../../components/VenueCard';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { Avatar } from '../../components/Avatar';
 import { getVenues } from '../../lib/api/venues';
 import { getVenueTypes } from '../../lib/api/venueTypes';
+import { getCustomer } from '../../lib/api/customers';
+import { useAuthStore } from '../../lib/store/authStore';
 import type { VenueDto, VenueTypeDto } from '../../types';
 
 const PAGE_SIZE = 25;
 
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export default function HomeScreen() {
   const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { customerId } = useAuthStore();
 
-  const {
-    data: venueTypesData,
-  } = useQuery({
+  // Debounce search input — wait 400ms after user stops typing
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => setDebouncedSearch(searchText.trim()), 400);
+    return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
+  }, [searchText]);
+
+  const { data: customer } = useQuery({
+    queryKey: ['customer', customerId],
+    queryFn: () => getCustomer(customerId!),
+    enabled: !!customerId,
+  });
+
+  const { data: venueTypesData } = useQuery({
     queryKey: ['venueTypes'],
     queryFn: () => getVenueTypes(1, 50),
   });
 
   const venueTypes: VenueTypeDto[] = useMemo(
-    () =>
-      (venueTypesData?.items ?? []).slice().sort((a, b) => a.displayOrder - b.displayOrder),
+    () => (venueTypesData?.items ?? []).slice().sort((a, b) => a.displayOrder - b.displayOrder),
     [venueTypesData]
   );
 
@@ -45,14 +72,15 @@ export default function HomeScreen() {
     refetch,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: ['venues', selectedTypeId],
-    queryFn: ({ pageParam = 1 }) => getVenues(pageParam as number, PAGE_SIZE, selectedTypeId),
+    queryKey: ['venues', selectedTypeId, debouncedSearch],
+    queryFn: ({ pageParam = 1 }) =>
+      getVenues(pageParam as number, PAGE_SIZE, selectedTypeId, debouncedSearch || undefined),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
   });
 
-  const filteredVenues: VenueDto[] = useMemo(
+  const venues: VenueDto[] = useMemo(
     () => data?.pages.flatMap((p) => p.items) ?? [],
     [data]
   );
@@ -78,54 +106,101 @@ export default function HomeScreen() {
     [typeMap]
   );
 
+  const firstName = customer?.name?.split(' ')[0] ?? '';
+
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
+      {/* Fixed header */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>Discover</Text>
-        <Text style={styles.subtitle}>Find and book on Hydra island</Text>
+        <Pressable hitSlop={8}>
+          <MaterialIcons name="menu" size={24} color={Colors.primary} />
+        </Pressable>
+        <Text style={styles.brand}>HYDRA</Text>
+        <Pressable onPress={() => router.push('/(app)/profile')} hitSlop={8}>
+          <Avatar name={customer?.name} size={32} fontSize={14} />
+        </Pressable>
       </View>
 
-      {/* Filter chips */}
-      {venueTypes.length > 0 && (
+      {/* Greeting */}
+      <View style={styles.greeting}>
+        <Text style={styles.greetingLabel}>WELCOME BACK</Text>
+        <Text style={styles.greetingHeadline}>
+          {getGreeting()}{firstName ? `, ${firstName}` : ''}
+        </Text>
+      </View>
+
+      {/* Search bar */}
+      <View style={styles.searchContainer}>
+        <MaterialIcons name="search" size={20} color={Colors.outline} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search venues…"
+          placeholderTextColor={Colors.outline}
+          value={searchText}
+          onChangeText={setSearchText}
+          returnKeyType="search"
+          clearButtonMode="never"
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
+        {searchText.length > 0 && (
+          <Pressable onPress={() => setSearchText('')} hitSlop={8}>
+            <MaterialIcons name="close" size={18} color={Colors.outline} />
+          </Pressable>
+        )}
+      </View>
+
+      {/* Venue type tabs */}
+      <View style={styles.tabsWrapper}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersContent}
-          style={styles.filters}
+          contentContainerStyle={styles.tabsContent}
         >
-          <FilterChip
-            label="All"
-            selected={selectedTypeId === null}
+          <Pressable
+            style={styles.tab}
             onPress={() => setSelectedTypeId(null)}
-          />
+          >
+            <Text style={[styles.tabLabel, selectedTypeId === null && styles.tabLabelActive]}>
+              All
+            </Text>
+            {selectedTypeId === null && <View style={styles.tabIndicator} />}
+          </Pressable>
+
           {venueTypes.map((t) => (
-            <FilterChip
+            <Pressable
               key={t.id}
-              label={t.name}
-              selected={selectedTypeId === t.id}
+              style={styles.tab}
               onPress={() => setSelectedTypeId(t.id)}
-            />
+            >
+              <Text style={[styles.tabLabel, selectedTypeId === t.id && styles.tabLabelActive]}>
+                {t.name}
+              </Text>
+              {selectedTypeId === t.id && <View style={styles.tabIndicator} />}
+            </Pressable>
           ))}
         </ScrollView>
-      )}
+        <View style={styles.tabsBottomBorder} />
+      </View>
 
       {/* Venue list */}
       {isLoading ? (
         <LoadingSpinner fullScreen />
       ) : (
         <FlatList
-          data={filteredVenues}
+          data={venues}
           keyExtractor={(item) => item.id}
           renderItem={renderVenueCard}
           contentContainerStyle={styles.listContent}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.3}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              tintColor={Colors.navy}
+              tintColor={Colors.primary}
             />
           }
           ListFooterComponent={
@@ -137,9 +212,15 @@ export default function HomeScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>🏛️</Text>
-              <Text style={styles.emptyTitle}>No venues found</Text>
-              <Text style={styles.emptyText}>Try a different filter or pull to refresh.</Text>
+              <View style={styles.emptyIconWrap}>
+                <MaterialIcons name="place" size={36} color={Colors.onSurfaceVariant} />
+              </View>
+              <Text style={styles.emptyTitle}>
+                {debouncedSearch ? `No results for "${debouncedSearch}"` : 'No venues found'}
+              </Text>
+              <Text style={styles.emptyText}>
+                {debouncedSearch ? 'Try a different search term.' : 'Try a different category or pull to refresh.'}
+              </Text>
             </View>
           }
         />
@@ -149,37 +230,104 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  safe: { flex: 1, backgroundColor: Colors.background },
+
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
+    height: 64,
+    backgroundColor: 'rgba(251,248,252,0.97)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
   },
+  brand: {
+    ...T.displayLg,
+    fontSize: 22,
+    letterSpacing: 8,
+    color: Colors.primary,
+  },
+
   greeting: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  filters: {
-    flexGrow: 0,
-    marginBottom: 8,
-  },
-  filtersContent: {
     paddingHorizontal: 20,
-    paddingBottom: 8,
+    paddingTop: 20,
+    paddingBottom: 14,
   },
+  greetingLabel: {
+    ...T.labelCaps,
+    color: Colors.secondary,
+    marginBottom: 4,
+  },
+  greetingHeadline: {
+    ...T.headlineMd,
+    color: Colors.primary,
+  },
+
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 4,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    paddingHorizontal: 12,
+    height: 48,
+  },
+  searchIcon: { marginRight: 8 },
+  searchInput: {
+    flex: 1,
+    ...T.bodyMd,
+    fontSize: 15,
+    color: Colors.onSurface,
+    paddingVertical: 0,
+  },
+
+  tabsWrapper: {
+    position: 'relative',
+    marginTop: 8,
+  },
+  tabsContent: {
+    paddingHorizontal: 20,
+  },
+  tabsBottomBorder: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.outlineVariant,
+  },
+  tab: {
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    marginRight: 24,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  tabLabel: {
+    ...T.buttonText,
+    fontSize: 14,
+    color: Colors.outline,
+  },
+  tabLabelActive: {
+    color: Colors.primary,
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: Colors.secondary,
+  },
+
   listContent: {
     paddingHorizontal: 20,
-    paddingTop: 4,
+    paddingTop: 16,
     paddingBottom: 20,
   },
   footerLoader: {
@@ -188,22 +336,28 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: 'center',
-    paddingTop: 80,
+    paddingTop: 60,
     paddingHorizontal: 32,
+    gap: 10,
   },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+  emptyIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: Colors.surfaceContainerHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    marginBottom: 8,
+    ...T.titleSm,
+    color: Colors.primary,
+    textAlign: 'center',
   },
   emptyText: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
     textAlign: 'center',
   },
 });

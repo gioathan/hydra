@@ -9,7 +9,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
 import { PhotoSlider } from '../../../../components/PhotoSlider';
 import { CalendarPicker } from '../../../../components/CalendarPicker';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
@@ -71,7 +73,7 @@ export default function VenueDetailScreen() {
   if (!venue) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.errorContainer}>
+        <View style={styles.centerFill}>
           <Text style={styles.errorText}>Venue not found.</Text>
         </View>
       </SafeAreaView>
@@ -83,41 +85,38 @@ export default function VenueDetailScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Back button */}
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backText}>‹</Text>
-        </Pressable>
-
-        {/* Hero image / slider */}
-        <PhotoSlider photos={venue.photos} name={venue.name} height={260} />
+        {/* Hero photo with floating back button */}
+        <View style={styles.heroContainer}>
+          <PhotoSlider photos={venue.photos} name={venue.name} height={300} />
+          <Pressable style={styles.backBtn} onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={20} color={Colors.primary} />
+          </Pressable>
+          {venueType && (
+            <View style={styles.typeBadge}>
+              <Text style={styles.typeText}>{venueType.name.toUpperCase()}</Text>
+            </View>
+          )}
+        </View>
 
         <View style={styles.content}>
-          {/* Venue info */}
-          <View style={styles.infoSection}>
-            <View style={styles.titleRow}>
-              <Text style={styles.venueName}>{venue.name}</Text>
-              {venueType && (
-                <View style={styles.typeBadge}>
-                  <Text style={styles.typeText}>{venueType.name}</Text>
-                </View>
-              )}
-            </View>
-
+          {/* Venue header */}
+          <View style={styles.venueHeader}>
+            <Text style={styles.venueName}>{venue.name}</Text>
             <View style={styles.metaRow}>
-              <Text style={styles.metaIcon}>📍</Text>
+              <MaterialIcons name="location-on" size={16} color={Colors.secondary} />
               <Text style={styles.metaText}>{venue.address}</Text>
             </View>
             <View style={styles.metaRow}>
-              <Text style={styles.metaIcon}>👥</Text>
-              <Text style={styles.metaText}>Capacity: {venue.capacity} guests</Text>
+              <MaterialIcons name="people" size={16} color={Colors.onSurfaceVariant} />
+              <Text style={styles.metaText}>Up to {venue.capacity} guests</Text>
             </View>
           </View>
 
           <View style={styles.divider} />
 
-          {/* Date picker section */}
+          {/* Date picker */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Select a Date</Text>
+            <Text style={styles.sectionTitle}>SELECT A DATE</Text>
             <CalendarPicker
               selectedDate={selectedDate}
               onDateChange={setSelectedDate}
@@ -125,16 +124,18 @@ export default function VenueDetailScreen() {
             />
           </View>
 
+          <View style={styles.divider} />
+
           {/* Party size */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Party Size</Text>
-            <View style={styles.partyStepper}>
+            <Text style={styles.sectionTitle}>PARTY SIZE</Text>
+            <View style={styles.stepperRow}>
               <Pressable
                 style={[styles.stepBtn, partySize <= 1 && styles.stepBtnDisabled]}
                 onPress={() => setPartySize((n) => Math.max(1, n - 1))}
                 disabled={partySize <= 1}
               >
-                <Text style={styles.stepIcon}>−</Text>
+                <MaterialIcons name="remove" size={20} color={partySize <= 1 ? Colors.outline : Colors.onPrimary} />
               </Pressable>
               <Text style={styles.partyCount}>{partySize}</Text>
               <Pressable
@@ -142,14 +143,15 @@ export default function VenueDetailScreen() {
                 onPress={() => setPartySize((n) => Math.min(maxParty, n + 1))}
                 disabled={partySize >= maxParty}
               >
-                <Text style={styles.stepIcon}>+</Text>
+                <MaterialIcons name="add" size={20} color={partySize >= maxParty ? Colors.outline : Colors.onPrimary} />
               </Pressable>
             </View>
-            <Text style={styles.partySizeHint}>Max {maxParty} guests</Text>
+            <Text style={styles.partySizeHint}>Maximum {maxParty} guests</Text>
           </View>
 
           {availabilityError && (
             <View style={styles.errorBox}>
+              <MaterialIcons name="info-outline" size={16} color={Colors.error} style={styles.errorIcon} />
               <Text style={styles.errorText}>{availabilityError}</Text>
             </View>
           )}
@@ -167,12 +169,10 @@ export default function VenueDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scroll: {
-    flex: 1,
+  safe: { flex: 1, backgroundColor: Colors.background },
+  scroll: { flex: 1 },
+  heroContainer: {
+    position: 'relative',
   },
   backBtn: {
     position: 'absolute',
@@ -182,131 +182,116 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.12,
     shadowRadius: 4,
     elevation: 4,
   },
-  backText: {
-    fontSize: 24,
-    color: Colors.navy,
-    lineHeight: 28,
+  typeBadge: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    backgroundColor: Colors.primary,
+    borderRadius: 99,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  typeText: {
+    ...T.labelCaps,
+    color: Colors.onPrimary,
+    fontSize: 10,
   },
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
-  infoSection: {
+  venueHeader: {
+    gap: 8,
     marginBottom: 20,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    marginBottom: 12,
-    flexWrap: 'wrap',
-  },
   venueName: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    flex: 1,
-    letterSpacing: -0.3,
-  },
-  typeBadge: {
-    backgroundColor: Colors.navy,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  typeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: Colors.textInverse,
+    ...T.headlineMd,
+    color: Colors.primary,
+    marginBottom: 4,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  metaIcon: {
-    fontSize: 15,
+    gap: 6,
   },
   metaText: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
     flex: 1,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: Colors.outlineVariant + '4D',
     marginVertical: 20,
   },
   section: {
-    marginBottom: 24,
+    gap: 16,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    marginBottom: 14,
+    ...T.labelCaps,
+    color: Colors.onSurfaceVariant,
   },
-  partyStepper: {
+  stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
+    gap: 28,
   },
   stepBtn: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: 12,
-    backgroundColor: Colors.navy,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepBtnDisabled: {
-    backgroundColor: Colors.border,
-  },
-  stepIcon: {
-    fontSize: 22,
-    color: Colors.textInverse,
-    fontWeight: '700',
-    lineHeight: 26,
+    backgroundColor: Colors.surfaceContainerHigh,
   },
   partyCount: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.textPrimary,
+    ...T.headlineMd,
+    color: Colors.primary,
     minWidth: 40,
     textAlign: 'center',
   },
   partySizeHint: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 8,
+    ...T.labelCaps,
+    color: Colors.outline,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    textTransform: 'none',
   },
   errorBox: {
-    backgroundColor: Colors.errorBg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: Colors.errorContainer,
     borderRadius: 10,
-    padding: 12,
-    marginBottom: 16,
+    padding: 14,
+    marginTop: 20,
+    gap: 8,
   },
+  errorIcon: { marginTop: 1 },
   errorText: {
-    color: Colors.error,
+    ...T.bodyMd,
     fontSize: 13,
+    color: Colors.error,
+    flex: 1,
   },
-  errorContainer: {
+  centerFill: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   slotsBtn: {
-    marginBottom: 32,
+    marginTop: 24,
   },
 });

@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/colors';
+import { T } from '../../../constants/typography';
 import { BookingCard } from '../../../components/BookingCard';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { PrimaryButton } from '../../../components/PrimaryButton';
@@ -82,12 +84,13 @@ export default function BookingsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>My Bookings</Text>
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={styles.tabsContainer}>
         <Pressable
           style={[styles.tab, activeTab === 'upcoming' && styles.tabActive]}
           onPress={() => setActiveTab('upcoming')}
@@ -95,6 +98,13 @@ export default function BookingsScreen() {
           <Text style={[styles.tabLabel, activeTab === 'upcoming' && styles.tabLabelActive]}>
             Upcoming
           </Text>
+          {upcomingBookings.length > 0 && (
+            <View style={[styles.tabBadge, activeTab === 'upcoming' && styles.tabBadgeActive]}>
+              <Text style={[styles.tabBadgeText, activeTab === 'upcoming' && styles.tabBadgeTextActive]}>
+                {upcomingBookings.length}
+              </Text>
+            </View>
+          )}
         </Pressable>
         <Pressable
           style={[styles.tab, activeTab === 'past' && styles.tabActive]}
@@ -120,22 +130,29 @@ export default function BookingsScreen() {
             />
           )}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              tintColor={Colors.navy}
+              tintColor={Colors.primary}
             />
           }
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>{activeTab === 'upcoming' ? '📅' : '🗂️'}</Text>
+              <View style={styles.emptyIcon}>
+                <MaterialIcons
+                  name={activeTab === 'upcoming' ? 'event' : 'history'}
+                  size={36}
+                  color={Colors.onSurfaceVariant}
+                />
+              </View>
               <Text style={styles.emptyTitle}>
                 {activeTab === 'upcoming' ? 'No upcoming bookings' : 'No past bookings'}
               </Text>
               <Text style={styles.emptyText}>
                 {activeTab === 'upcoming'
-                  ? 'Explore venues and make your first booking!'
+                  ? 'Explore venues and make your first booking.'
                   : 'Your completed bookings will appear here.'}
               </Text>
               {activeTab === 'upcoming' && (
@@ -154,50 +171,70 @@ export default function BookingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  safe: { flex: 1, backgroundColor: Colors.background },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingTop: 20,
+    paddingBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
+    ...T.headlineMd,
+    color: Colors.primary,
   },
-  tabs: {
+  tabsContainer: {
     flexDirection: 'row',
     marginHorizontal: 20,
     marginBottom: 16,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceContainerHigh,
     borderRadius: 12,
     padding: 4,
   },
   tab: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 9,
     borderRadius: 9,
-    alignItems: 'center',
+    gap: 6,
   },
   tabActive: {
-    backgroundColor: Colors.card,
-    shadowColor: Colors.navy,
+    backgroundColor: Colors.surfaceContainerLowest,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,
   },
   tabLabel: {
+    ...T.buttonText,
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textMuted,
+    color: Colors.outline,
   },
   tabLabelActive: {
-    color: Colors.navy,
+    color: Colors.primary,
+  },
+  tabBadge: {
+    backgroundColor: Colors.outlineVariant,
+    borderRadius: 99,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+  tabBadgeActive: {
+    backgroundColor: Colors.secondary,
+  },
+  tabBadgeText: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+    letterSpacing: 0,
+    textTransform: 'none',
+  },
+  tabBadgeTextActive: {
+    color: Colors.onSecondary,
   },
   listContent: {
     paddingHorizontal: 20,
@@ -208,23 +245,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 24,
+    gap: 10,
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: Colors.surfaceContainerHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
   },
-  emptyText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+  emptyTitle: {
+    ...T.titleSm,
+    color: Colors.primary,
     textAlign: 'center',
-    marginBottom: 28,
-    lineHeight: 21,
+  },
+  emptyText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 20,
   },
   discoverBtn: {
     width: 200,

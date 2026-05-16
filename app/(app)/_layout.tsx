@@ -1,40 +1,33 @@
 import React, { useEffect } from 'react';
 import { Tabs, router } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { useAuthStore } from '../../lib/store/authStore';
 
-function TabIcon({ focused, label, icon }: { focused: boolean; label: string; icon: string }) {
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
+function TabIcon({
+  focused,
+  label,
+  icon,
+}: {
+  focused: boolean;
+  label: string;
+  icon: IconName;
+}) {
   return (
-    <View style={tabStyles.iconWrapper}>
-      <Text style={[tabStyles.icon, focused && tabStyles.iconFocused]}>{icon}</Text>
-      <Text style={[tabStyles.label, focused && tabStyles.labelFocused]}>{label}</Text>
+    <View style={styles.iconWrapper}>
+      {focused && <View style={styles.indicator} />}
+      <MaterialIcons
+        name={icon}
+        size={24}
+        color={focused ? Colors.secondary : Colors.onSurfaceVariant}
+      />
+      <Text style={[styles.label, focused && styles.labelFocused]}>{label}</Text>
     </View>
   );
 }
-
-const tabStyles = StyleSheet.create({
-  iconWrapper: {
-    alignItems: 'center',
-    paddingTop: 6,
-  },
-  icon: {
-    fontSize: 22,
-    color: Colors.textMuted,
-  },
-  iconFocused: {
-    color: Colors.navy,
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
-  labelFocused: {
-    color: Colors.navy,
-  },
-});
 
 export default function AppLayout() {
   const { token, isRehydrated } = useAuthStore();
@@ -49,13 +42,7 @@ export default function AppLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: Colors.card,
-          borderTopColor: Colors.border,
-          borderTopWidth: 1,
-          height: 80,
-          paddingBottom: 16,
-        },
+        tabBarStyle: styles.tabBar,
         tabBarShowLabel: false,
       }}
     >
@@ -63,7 +50,7 @@ export default function AppLayout() {
         name="index"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} label="Discover" icon="🏛️" />
+            <TabIcon focused={focused} label="Discover" icon="explore" />
           ),
         }}
       />
@@ -71,24 +58,61 @@ export default function AppLayout() {
         name="bookings"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} label="Bookings" icon="📋" />
+            <TabIcon focused={focused} label="Bookings" icon="event-note" />
           ),
         }}
       />
       <Tabs.Screen
         name="venues"
-        options={{
-          href: null,
-        }}
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} label="Profile" icon="👤" />
+            <TabIcon focused={focused} label="Profile" icon="person" />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: 'rgba(251, 248, 252, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: Colors.outlineVariant + '4D',
+    height: 80,
+    paddingBottom: 16,
+    paddingTop: 4,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  iconWrapper: {
+    alignItems: 'center',
+    paddingTop: 4,
+    position: 'relative',
+    width: 80,
+  },
+  indicator: {
+    position: 'absolute',
+    top: -8,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: Colors.secondary,
+    borderRadius: 1,
+  },
+  label: {
+    fontSize: 10,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    color: Colors.onSurfaceVariant,
+    marginTop: 3,
+  },
+  labelFocused: {
+    color: Colors.secondary,
+  },
+});

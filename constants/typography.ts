@@ -1,64 +1,35 @@
-import { StyleSheet } from 'react-native';
-import { Colors } from './colors';
-
-export const Typography = StyleSheet.create({
-  display: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
+export const T = {
+  displayLg: {
+    fontFamily: 'NotoSerif_700Bold',
+    fontSize: 40,
+    lineHeight: 48,
+    letterSpacing: -0.8,
   },
-  h1: {
+  headlineMd: {
+    fontFamily: 'NotoSerif_700Bold',
     fontSize: 28,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.3,
+    lineHeight: 36,
   },
-  h2: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+  titleSm: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 20,
+    lineHeight: 28,
   },
-  h3: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+  bodyMd: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 16,
+    lineHeight: 26,
   },
-  bodyLarge: {
-    fontSize: 17,
-    fontWeight: '400',
-    color: Colors.textPrimary,
-  },
-  body: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: Colors.textPrimary,
-  },
-  bodyMedium: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.textPrimary,
-  },
-  caption: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: Colors.textSecondary,
-  },
-  captionMedium: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: Colors.textSecondary,
-  },
-  small: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: Colors.textMuted,
-  },
-  label: {
+  labelCaps: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+    lineHeight: 12,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
   },
-});
+  buttonText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 16,
+    lineHeight: 20,
+  },
+} as const;

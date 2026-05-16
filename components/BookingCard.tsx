@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
+import { T } from '../constants/typography';
 import { StatusBadge } from './StatusBadge';
 import { formatLocalDate, formatLocalTime, shortId } from '../lib/utils';
 import type { BookingDto } from '../types';
@@ -13,7 +15,10 @@ interface BookingCardProps {
 
 export function BookingCard({ booking, venueName, onPress }: BookingCardProps) {
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      onPress={onPress}
+    >
       <View style={styles.topRow}>
         <Text style={styles.venueName} numberOfLines={1}>
           {venueName ?? '…'}
@@ -23,15 +28,17 @@ export function BookingCard({ booking, venueName, onPress }: BookingCardProps) {
 
       <View style={styles.meta}>
         <View style={styles.metaItem}>
-          <Text style={styles.metaLabel}>Date</Text>
+          <MaterialIcons name="event" size={13} color={Colors.onSurfaceVariant} />
           <Text style={styles.metaValue}>{formatLocalDate(booking.startUtc)}</Text>
         </View>
+        <View style={styles.metaDot} />
         <View style={styles.metaItem}>
-          <Text style={styles.metaLabel}>Time</Text>
+          <MaterialIcons name="schedule" size={13} color={Colors.onSurfaceVariant} />
           <Text style={styles.metaValue}>{formatLocalTime(booking.startUtc)}</Text>
         </View>
+        <View style={styles.metaDot} />
         <View style={styles.metaItem}>
-          <Text style={styles.metaLabel}>Guests</Text>
+          <MaterialIcons name="people" size={13} color={Colors.onSurfaceVariant} />
           <Text style={styles.metaValue}>{booking.partySize}</Text>
         </View>
       </View>
@@ -43,51 +50,59 @@ export function BookingCard({ booking, venueName, onPress }: BookingCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: 14,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: Colors.navy,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     elevation: 2,
   },
+  pressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 10,
     gap: 8,
   },
   venueName: {
+    ...T.titleSm,
     fontSize: 16,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    color: Colors.primary,
     flex: 1,
   },
   meta: {
     flexDirection: 'row',
-    gap: 20,
-    marginBottom: 12,
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
   },
   metaItem: {
-    gap: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  metaLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.outlineVariant,
   },
   metaValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+    ...T.bodyMd,
+    fontSize: 13,
+    color: Colors.onSurfaceVariant,
   },
   ref: {
-    fontSize: 12,
-    color: Colors.textMuted,
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.outline,
+    letterSpacing: 0.5,
+    textTransform: 'none',
   },
 });

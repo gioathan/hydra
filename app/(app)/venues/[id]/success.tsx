@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { shortId } from '../../../../lib/utils';
 
@@ -15,8 +17,9 @@ export default function SuccessScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.content}>
+        {/* Check icon */}
         <View style={styles.iconCircle}>
-          <Text style={styles.icon}>✓</Text>
+          <MaterialIcons name="check" size={44} color={Colors.statusConfirmed} />
         </View>
 
         <Text style={styles.title}>Booking Requested!</Text>
@@ -24,30 +27,32 @@ export default function SuccessScreen() {
           Your booking at {venueName} has been submitted and is pending confirmation.
         </Text>
 
+        {/* Reference number */}
         {bookingId && (
           <View style={styles.refCard}>
-            <Text style={styles.refLabel}>Booking Reference</Text>
+            <Text style={styles.refLabel}>BOOKING REFERENCE</Text>
             <Text style={styles.refValue}>#{shortId(bookingId)}</Text>
           </View>
         )}
 
+        {/* Notification note */}
         <View style={styles.note}>
+          <MaterialIcons name="notifications-none" size={18} color={Colors.onSurfaceVariant} />
           <Text style={styles.noteText}>
-            You'll receive a push notification when the venue confirms or updates your booking.
+            You'll be notified when the venue confirms your booking.
           </Text>
         </View>
 
+        {/* Actions */}
         <View style={styles.actions}>
           <PrimaryButton
             title="View My Bookings"
             onPress={() => router.replace('/(app)/bookings')}
-            style={styles.btn}
           />
           <PrimaryButton
             title="Back to Home"
             onPress={() => router.replace('/(app)')}
             variant="outline"
-            style={styles.btn}
           />
         </View>
       </View>
@@ -56,87 +61,82 @@ export default function SuccessScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  safe: { flex: 1, backgroundColor: Colors.background },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
+    gap: 0,
   },
   iconCircle: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     backgroundColor: Colors.statusConfirmedBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,
   },
-  icon: {
-    fontSize: 40,
-    color: Colors.statusConfirmed,
-    fontWeight: '700',
-  },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: Colors.textPrimary,
+    ...T.headlineMd,
+    color: Colors.primary,
     textAlign: 'center',
-    letterSpacing: -0.5,
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
+    ...T.bodyMd,
+    color: Colors.onSurfaceVariant,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26,
     marginBottom: 32,
   },
   refCard: {
-    backgroundColor: Colors.card,
-    borderRadius: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 28,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 32,
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: Colors.navy,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
+    marginBottom: 20,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
   refLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    ...T.labelCaps,
+    color: Colors.onSurfaceVariant,
     marginBottom: 6,
   },
   refValue: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: Colors.navy,
-    letterSpacing: 1,
+    ...T.headlineMd,
+    fontSize: 24,
+    color: Colors.primary,
+    letterSpacing: 2,
   },
   note: {
-    backgroundColor: Colors.overlayLight,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: Colors.surfaceContainerLow,
     borderRadius: 10,
     padding: 14,
-    marginBottom: 36,
+    marginBottom: 32,
+    width: '100%',
   },
   noteText: {
+    ...T.bodyMd,
     fontSize: 13,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 19,
+    color: Colors.onSurfaceVariant,
+    flex: 1,
+    lineHeight: 20,
   },
   actions: {
     width: '100%',
     gap: 12,
   },
-  btn: {},
 });

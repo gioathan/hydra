@@ -9,7 +9,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { LoadingSpinner } from '../../../../components/LoadingSpinner';
 import { Avatar } from '../../../../components/Avatar';
@@ -62,18 +64,19 @@ export default function ConfirmScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.headerBar}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>‹</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn} hitSlop={8}>
+          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Confirm Booking</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* Booking Summary */}
+        {/* Booking summary */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Booking Summary</Text>
+          <Text style={styles.cardLabel}>BOOKING SUMMARY</Text>
 
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Venue</Text>
@@ -93,10 +96,10 @@ export default function ConfirmScreen() {
           </View>
         </View>
 
-        {/* Customer Details */}
+        {/* Customer details */}
         {customer && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Your Details</Text>
+            <Text style={styles.cardLabel}>YOUR DETAILS</Text>
             <View style={styles.customerRow}>
               <Avatar name={customer.name} size={44} fontSize={18} />
               <View style={styles.customerInfo}>
@@ -105,7 +108,7 @@ export default function ConfirmScreen() {
               </View>
             </View>
             {customer.phone && customer.email && (
-              <View style={styles.row}>
+              <View style={[styles.row, styles.rowLast]}>
                 <Text style={styles.rowLabel}>Phone</Text>
                 <Text style={styles.rowValue}>{customer.phone}</Text>
               </View>
@@ -115,15 +118,14 @@ export default function ConfirmScreen() {
 
         {error && (
           <View style={styles.errorBox}>
+            <MaterialIcons name="error-outline" size={16} color={Colors.error} />
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
 
-        <View style={styles.termsNote}>
-          <Text style={styles.termsText}>
-            By confirming, you agree to the venue's booking policy. Cancellations can be made from My Bookings.
-          </Text>
-        </View>
+        <Text style={styles.termsText}>
+          By confirming, you agree to the venue's booking policy. Cancellations can be made from My Bookings.
+        </Text>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -138,19 +140,16 @@ export default function ConfirmScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  headerBar: {
+  safe: { flex: 1, backgroundColor: Colors.background },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    backgroundColor: Colors.card,
+    height: 64,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
   },
   backBtn: {
     width: 40,
@@ -158,60 +157,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: {
-    fontSize: 24,
-    color: Colors.navy,
-  },
   headerTitle: {
+    ...T.titleSm,
     fontSize: 17,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
   },
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: 16,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: Colors.navy,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
-  cardTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+  cardLabel: {
+    ...T.labelCaps,
+    color: Colors.secondary,
     marginBottom: 14,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 11,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
+    borderBottomColor: Colors.outlineVariant + '4D',
   },
   rowLast: {
     borderBottomWidth: 0,
   },
   rowLabel: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
   },
   rowValue: {
+    ...T.bodyMd,
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.primary,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    textAlign: 'right',
+    flex: 1,
+    marginLeft: 16,
   },
   customerRow: {
     flexDirection: 'row',
@@ -219,44 +216,46 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 12,
   },
-  customerInfo: {
-    flex: 1,
-  },
+  customerInfo: { flex: 1 },
   customerName: {
+    ...T.titleSm,
     fontSize: 15,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
   customerMeta: {
+    ...T.bodyMd,
     fontSize: 13,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
     marginTop: 2,
   },
   errorBox: {
-    backgroundColor: Colors.errorBg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: Colors.errorContainer,
     borderRadius: 10,
-    padding: 12,
+    padding: 14,
     marginBottom: 16,
   },
   errorText: {
-    color: Colors.error,
+    ...T.bodyMd,
     fontSize: 13,
-    fontWeight: '500',
-  },
-  termsNote: {
-    padding: 12,
+    color: Colors.error,
+    flex: 1,
   },
   termsText: {
+    ...T.bodyMd,
     fontSize: 12,
-    color: Colors.textMuted,
+    color: Colors.outline,
     textAlign: 'center',
     lineHeight: 18,
+    paddingHorizontal: 8,
   },
   footer: {
     padding: 20,
     paddingBottom: 28,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    backgroundColor: Colors.card,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
   },
 });

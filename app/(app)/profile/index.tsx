@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/colors';
+import { T } from '../../../constants/typography';
 import { Avatar } from '../../../components/Avatar';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { getCustomer } from '../../../lib/api/customers';
@@ -18,8 +20,10 @@ import { useAuthStore } from '../../../lib/store/authStore';
 import { clearAll } from '../../../lib/secureStore';
 import { unregisterPushNotifications } from '../../../lib/notifications';
 
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
 interface MenuRowProps {
-  icon: string;
+  icon: IconName;
   label: string;
   onPress: () => void;
   destructive?: boolean;
@@ -27,12 +31,23 @@ interface MenuRowProps {
 
 function MenuRow({ icon, label, onPress, destructive }: MenuRowProps) {
   return (
-    <Pressable style={styles.menuRow} onPress={onPress}>
+    <Pressable
+      style={({ pressed }) => [styles.menuRow, pressed && styles.menuRowPressed]}
+      onPress={onPress}
+    >
       <View style={styles.menuRowLeft}>
-        <Text style={styles.menuIcon}>{icon}</Text>
+        <View style={[styles.menuIconContainer, destructive && styles.menuIconContainerDestructive]}>
+          <MaterialIcons
+            name={icon}
+            size={20}
+            color={destructive ? Colors.error : Colors.primary}
+          />
+        </View>
         <Text style={[styles.menuLabel, destructive && styles.menuLabelDestructive]}>{label}</Text>
       </View>
-      {!destructive && <Text style={styles.menuChevron}>›</Text>}
+      {!destructive && (
+        <MaterialIcons name="chevron-right" size={20} color={Colors.outline} />
+      )}
     </Pressable>
   );
 }
@@ -54,9 +69,7 @@ export default function ProfileScreen() {
         text: 'Sign Out',
         style: 'destructive',
         onPress: async () => {
-          if (customerId) {
-            await unregisterPushNotifications(customerId);
-          }
+          if (customerId) await unregisterPushNotifications(customerId);
           clearAuth();
           await clearAll();
           queryClient.clear();
@@ -70,38 +83,38 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Profile hero */}
-        <View style={styles.profileHero}>
-          <Avatar name={customer?.name} size={80} fontSize={32} />
+        <View style={styles.hero}>
+          <Avatar name={customer?.name} size={84} fontSize={34} />
           <Text style={styles.customerName}>{customer?.name ?? '—'}</Text>
           <Text style={styles.customerEmail}>{customer?.email ?? customer?.phone ?? '—'}</Text>
         </View>
 
-        {/* Account section */}
+        {/* Account */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={styles.sectionTitle}>ACCOUNT</Text>
           <View style={styles.menuGroup}>
             <MenuRow
-              icon="✏️"
+              icon="edit"
               label="Edit Profile"
               onPress={() => router.push('/(app)/profile/edit')}
             />
             <View style={styles.separator} />
             <MenuRow
-              icon="🔒"
+              icon="lock-outline"
               label="Change Password"
               onPress={() => router.push('/(app)/profile/password')}
             />
           </View>
         </View>
 
-        {/* Bookings shortcut */}
+        {/* Bookings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Bookings</Text>
+          <Text style={styles.sectionTitle}>BOOKINGS</Text>
           <View style={styles.menuGroup}>
             <MenuRow
-              icon="📋"
+              icon="event-note"
               label="My Bookings"
               onPress={() => router.push('/(app)/bookings')}
             />
@@ -111,7 +124,7 @@ export default function ProfileScreen() {
         {/* Sign out */}
         <View style={styles.section}>
           <View style={styles.menuGroup}>
-            <MenuRow icon="🚪" label="Sign Out" onPress={handleSignOut} destructive />
+            <MenuRow icon="exit-to-app" label="Sign Out" onPress={handleSignOut} destructive />
           </View>
         </View>
 
@@ -122,59 +135,50 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  profileHero: {
+  safe: { flex: 1, backgroundColor: Colors.background },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 48 },
+  hero: {
     alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 28,
+    paddingTop: 36,
+    paddingBottom: 32,
     paddingHorizontal: 20,
-    backgroundColor: Colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
     marginBottom: 8,
+    gap: 6,
   },
   customerName: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    marginTop: 14,
-    letterSpacing: -0.3,
+    ...T.titleSm,
+    color: Colors.primary,
+    marginTop: 8,
   },
   customerEmail: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
-    marginTop: 4,
+    color: Colors.onSurfaceVariant,
   },
   section: {
-    marginTop: 16,
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginBottom: 8,
+    ...T.labelCaps,
+    color: Colors.onSurfaceVariant,
+    marginBottom: 10,
     marginLeft: 4,
   },
   menuGroup: {
-    backgroundColor: Colors.card,
-    borderRadius: 14,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: Colors.navy,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
     elevation: 1,
   },
   menuRow: {
@@ -182,37 +186,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 15,
+    paddingVertical: 14,
+  },
+  menuRowPressed: {
+    backgroundColor: Colors.surfaceContainerLow,
   },
   menuRowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  menuIcon: {
-    fontSize: 18,
+  menuIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: Colors.primaryContainer + '33',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuIconContainerDestructive: {
+    backgroundColor: Colors.errorContainer,
   },
   menuLabel: {
+    ...T.bodyMd,
     fontSize: 15,
-    fontWeight: '500',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
   menuLabelDestructive: {
     color: Colors.error,
   },
-  menuChevron: {
-    fontSize: 18,
-    color: Colors.textMuted,
-  },
   separator: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginLeft: 52,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.outlineVariant,
+    marginLeft: 64,
   },
   version: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.outline,
     textAlign: 'center',
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 32,
+    marginTop: 36,
+    letterSpacing: 1,
   },
 });

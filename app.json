@@ -37,15 +37,18 @@
           "color": "#1B2B4B",
           "sounds": []
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "hydra-booking"
+        "projectId": "f91ded5d-bc30-48e5-ab5d-cba14c5de109"
       }
-    }
+    },
+    "owner": "gioathan"
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
+import { T } from '../constants/typography';
 
 interface FilterChipProps {
   label: string;
@@ -12,7 +13,11 @@ export function FilterChip({ label, selected, onPress }: FilterChipProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.chip, selected ? styles.chipSelected : styles.chipDefault]}
+      style={({ pressed }) => [
+        styles.chip,
+        selected ? styles.chipSelected : styles.chipDefault,
+        pressed && styles.pressed,
+      ]}
     >
       <Text style={[styles.label, selected ? styles.labelSelected : styles.labelDefault]}>
         {label}
@@ -23,28 +28,22 @@ export function FilterChip({ label, selected, onPress }: FilterChipProps) {
 
 const styles = StyleSheet.create({
   chip: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 99,
     marginRight: 8,
-    borderWidth: 1.5,
+    borderWidth: 1,
   },
   chipDefault: {
-    backgroundColor: Colors.card,
-    borderColor: Colors.border,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderColor: Colors.outlineVariant + '66',
   },
   chipSelected: {
-    backgroundColor: Colors.navy,
-    borderColor: Colors.navy,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  labelDefault: {
-    color: Colors.textSecondary,
-  },
-  labelSelected: {
-    color: Colors.textInverse,
-  },
+  label: { ...T.buttonText, fontSize: 14 },
+  labelDefault: { color: Colors.onSurfaceVariant },
+  labelSelected: { color: Colors.onPrimary },
+  pressed: { opacity: 0.8 },
 });

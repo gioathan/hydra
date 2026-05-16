@@ -26,12 +26,17 @@ apiClient.interceptors.request.use(async (config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
   return config;
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`[API] ${response.status} ${response.config.url}`);
+    return response;
+  },
   async (error) => {
+    console.log(`[API] ERROR ${error.config?.url} — ${error.message}`);
     if (error.response?.status === 401) {
       useAuthStore.getState().clearAuth();
       await clearAll();

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, ActivityIndicator, StyleSheet, PressableProps } from 'react-native';
 import { Colors } from '../constants/colors';
+import { T } from '../constants/typography';
 
 interface PrimaryButtonProps extends PressableProps {
   title: string;
@@ -33,7 +34,7 @@ export function PrimaryButton({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' || variant === 'danger' ? Colors.textInverse : Colors.navy}
+          color={variant === 'primary' || variant === 'danger' ? Colors.onPrimary : Colors.primary}
         />
       ) : (
         <Text style={[styles.label, styles[`${variant}Label` as keyof typeof styles]]}>
@@ -46,48 +47,40 @@ export function PrimaryButton({
 
 const styles = StyleSheet.create({
   base: {
-    height: 52,
-    borderRadius: 14,
+    height: 56,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
   primary: {
-    backgroundColor: Colors.terracotta,
+    backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   ghost: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: Colors.textInverse,
+    borderColor: 'rgba(251,248,252,0.4)',
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: Colors.navy,
+    borderColor: Colors.primary,
   },
   danger: {
-    backgroundColor: Colors.error,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.error + '33',
   },
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  primaryLabel: {
-    color: Colors.textInverse,
-  },
-  ghostLabel: {
-    color: Colors.textInverse,
-  },
-  outlineLabel: {
-    color: Colors.navy,
-  },
-  dangerLabel: {
-    color: Colors.textInverse,
-  },
+  disabled: { opacity: 0.5 },
+  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  label: { ...T.buttonText },
+  primaryLabel: { color: Colors.onPrimary },
+  ghostLabel: { color: Colors.surfaceBright },
+  outlineLabel: { color: Colors.primary },
+  dangerLabel: { color: Colors.error },
 });

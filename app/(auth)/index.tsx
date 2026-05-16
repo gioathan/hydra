@@ -1,58 +1,48 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  Dimensions,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
-import { PrimaryButton } from '../../components/PrimaryButton';
-
-const { height } = Dimensions.get('window');
+import { T } from '../../constants/typography';
 
 export default function SplashScreen() {
   return (
     <View style={styles.root}>
-      {/* Hero background */}
       <Image
         source={require('../../assets/images/splash.png')}
         style={styles.bg}
         resizeMode="cover"
       />
-
-      {/* Dark overlay */}
       <View style={styles.overlay} />
 
       <SafeAreaView style={styles.safe}>
         <View style={styles.content}>
-          {/* Top — logo + branding */}
           <View style={styles.topSection}>
-            <Image
-              source={require('../../assets/images/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.appName}>Hydra</Text>
-            <Text style={styles.tagline}>Book the best of the island.</Text>
+            <Text style={styles.brand}>HYDRA</Text>
+            <View style={styles.brandDivider} />
           </View>
 
-          {/* Bottom — CTAs */}
           <View style={styles.bottomSection}>
-            <PrimaryButton
-              title="Sign In"
+            <Text style={styles.tagline}>Book the best of the island.</Text>
+
+            <Pressable
+              style={({ pressed }) => [styles.signInBtn, pressed && styles.pressed]}
               onPress={() => router.push('/(auth)/login')}
-              variant="primary"
-              style={styles.signInBtn}
-            />
-            <PrimaryButton
-              title="Create Account"
+            >
+              <Text style={styles.signInLabel}>Sign In</Text>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.createBtn, pressed && styles.pressed]}
               onPress={() => router.push('/(auth)/register')}
-              variant="ghost"
-              style={styles.createBtn}
-            />
+            >
+              <Text style={styles.createLabel}>Create Account</Text>
+            </Pressable>
+
+            <View style={styles.dots}>
+              <View style={[styles.dot, styles.dotActive]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -63,7 +53,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: Colors.navy,
+    backgroundColor: Colors.primary,
   },
   bg: {
     position: 'absolute',
@@ -74,48 +64,90 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(10, 18, 35, 0.55)',
+    backgroundColor: 'rgba(4, 22, 53, 0.82)',
   },
   safe: {
     flex: 1,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: 20,
     justifyContent: 'space-between',
-    paddingVertical: 24,
   },
   topSection: {
-    marginTop: height * 0.12,
-    alignItems: 'flex-start',
+    marginTop: 64,
+    alignItems: 'center',
   },
-  logo: {
-    width: 56,
-    height: 56,
-    marginBottom: 16,
-    tintColor: Colors.textInverse,
+  brand: {
+    ...T.displayLg,
+    color: Colors.surfaceBright,
+    letterSpacing: 12,
   },
-  appName: {
-    fontSize: 52,
-    fontWeight: '800',
-    color: Colors.textInverse,
-    letterSpacing: -1.5,
-    lineHeight: 56,
-  },
-  tagline: {
-    fontSize: 20,
-    color: 'rgba(255,255,255,0.75)',
+  brandDivider: {
+    width: 48,
+    height: 2,
+    backgroundColor: Colors.secondary,
+    borderRadius: 1,
     marginTop: 8,
-    fontWeight: '400',
   },
   bottomSection: {
-    gap: 12,
-    marginBottom: 16,
+    gap: 16,
+    paddingBottom: 40,
+  },
+  tagline: {
+    ...T.bodyMd,
+    color: 'rgba(251,248,252,0.85)',
+    textAlign: 'center',
+    marginBottom: 8,
   },
   signInBtn: {
-    backgroundColor: Colors.terracotta,
+    height: 56,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  signInLabel: {
+    ...T.buttonText,
+    color: Colors.onPrimary,
   },
   createBtn: {
-    borderColor: 'rgba(255,255,255,0.6)',
+    height: 56,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(251,248,252,0.4)',
+    backgroundColor: 'rgba(251,248,252,0.08)',
+  },
+  createLabel: {
+    ...T.buttonText,
+    color: Colors.surfaceBright,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(251,248,252,0.3)',
+  },
+  dotActive: {
+    backgroundColor: Colors.secondary,
   },
 });

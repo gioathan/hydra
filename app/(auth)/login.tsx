@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   StyleSheet,
   SafeAreaView,
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import { Colors } from '../../constants/colors';
-import { InputField } from '../../components/InputField';
-import { PrimaryButton } from '../../components/PrimaryButton';
+import { T } from '../../constants/typography';
 import { login } from '../../lib/api/auth';
 import { useAuthStore } from '../../lib/store/authStore';
 import { saveToken, saveUser, saveCustomerId } from '../../lib/secureStore';
@@ -23,6 +25,7 @@ import { getAxiosErrorMessage } from '../../lib/utils';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { setAuth } = useAuthStore();
 
@@ -56,42 +59,72 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {/* Fixed header */}
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} hitSlop={12}>
+            <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+          </Pressable>
+          <Text style={styles.headerBrand}>HYDRA</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Back */}
-          <Pressable style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backText}>‹ Back</Text>
-          </Pressable>
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>Welcome back</Text>
+            <Text style={styles.subtitle}>
+              Please sign in to access your curated island experience.
+            </Text>
+          </View>
 
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to continue booking.</Text>
+          {/* Form card */}
+          <View style={styles.card}>
+            {/* Email */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>Email</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  placeholder="guest@aegean.com"
+                  placeholderTextColor={Colors.outlineVariant}
+                />
+              </View>
+            </View>
 
-          <View style={styles.form}>
-            <InputField
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              placeholder="you@example.com"
-            />
-            <InputField
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              showToggle
-              secureTextEntry
-              autoComplete="current-password"
-              placeholder="••••••••••"
-            />
+            {/* Password */}
+            <View style={styles.fieldGroup}>
+              <View style={styles.labelRow}>
+                <Text style={styles.fieldLabel}>Password</Text>
+                <Text style={styles.forgotLink}>Forgot?</Text>
+              </View>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  placeholderTextColor={Colors.outlineVariant}
+                />
+                <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                  <MaterialIcons
+                    name={showPassword ? 'visibility-off' : 'visibility'}
+                    size={20}
+                    color={Colors.onSurfaceVariant}
+                  />
+                </Pressable>
+              </View>
+            </View>
 
             {error && (
               <View style={styles.errorBox}>
@@ -99,18 +132,23 @@ export default function LoginScreen() {
               </View>
             )}
 
-            <PrimaryButton
-              title="Sign In"
+            <Pressable
+              style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
               onPress={handleLogin}
-              loading={mutation.isPending}
-              style={styles.submitBtn}
-            />
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? (
+                <ActivityIndicator size="small" color={Colors.onPrimary} />
+              ) : (
+                <Text style={styles.submitLabel}>Sign In</Text>
+              )}
+            </Pressable>
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
+            <Text style={styles.footerText}>New here? </Text>
             <Pressable onPress={() => router.replace('/(auth)/register')}>
-              <Text style={styles.footerLink}> Create one</Text>
+              <Text style={styles.footerLink}>Create account</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -124,55 +162,121 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  flex: {
-    flex: 1,
+  flex: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    height: 64,
+    backgroundColor: 'rgba(251,248,252,0.8)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
   },
-  scroll: {
-    flex: 1,
+  headerBrand: {
+    ...T.displayLg,
+    fontSize: 24,
+    letterSpacing: 8,
+    color: Colors.primary,
   },
+  scroll: { flex: 1 },
   scrollContent: {
-    padding: 24,
-    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 40,
     flexGrow: 1,
   },
-  backBtn: {
-    alignSelf: 'flex-start',
-    paddingVertical: 8,
-    marginBottom: 24,
-  },
-  backText: {
-    fontSize: 16,
-    color: Colors.navy,
-    fontWeight: '600',
+  titleSection: {
+    marginBottom: 32,
   },
   title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
+    ...T.headlineMd,
+    color: Colors.primary,
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    marginBottom: 32,
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+    lineHeight: 22,
   },
-  form: {
-    gap: 0,
+  card: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
+    padding: 24,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '33',
+    gap: 24,
+  },
+  fieldGroup: {
+    gap: 6,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  fieldLabel: {
+    ...T.labelCaps,
+    color: Colors.onSurfaceVariant,
+    marginLeft: 4,
+  },
+  forgotLink: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.secondaryContainer,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surfaceContainerLow,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.outlineVariant,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  input: {
+    ...T.bodyMd,
+    color: Colors.onSurface,
+    flex: 1,
   },
   errorBox: {
-    backgroundColor: Colors.errorBg,
-    borderRadius: 10,
+    backgroundColor: Colors.errorContainer,
+    borderRadius: 8,
     padding: 12,
-    marginBottom: 16,
   },
   errorText: {
-    color: Colors.error,
-    fontSize: 13,
-    fontWeight: '500',
+    ...T.labelCaps,
+    color: Colors.onErrorContainer,
+    letterSpacing: 0,
+    textTransform: 'none',
   },
   submitBtn: {
-    marginTop: 8,
+    height: 56,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitLabel: {
+    ...T.buttonText,
+    color: Colors.onPrimary,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   footer: {
     flexDirection: 'row',
@@ -180,12 +284,15 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   footerText: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
   },
   footerLink: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.terracotta,
-    fontWeight: '700',
+    color: Colors.secondary,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    textDecorationLine: 'underline',
   },
 });

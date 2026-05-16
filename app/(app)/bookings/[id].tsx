@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/colors';
+import { T } from '../../../constants/typography';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { PrimaryButton } from '../../../components/PrimaryButton';
@@ -53,10 +55,7 @@ export default function BookingDetailScreen() {
   if (!booking) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.errorContainer}>
-          <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backText}>‹</Text>
-          </Pressable>
+        <View style={styles.centerFill}>
           <Text style={styles.errorText}>Booking not found.</Text>
         </View>
       </SafeAreaView>
@@ -68,16 +67,17 @@ export default function BookingDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.headerBar}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>‹</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn} hitSlop={8}>
+          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Booking Detail</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* Venue + status header */}
+        {/* Hero card */}
         <View style={[styles.heroCard, isInactive && styles.heroCardInactive]}>
           <Text style={[styles.heroVenueName, isInactive && styles.heroVenueNameInactive]}>
             {venue?.name ?? '…'}
@@ -87,8 +87,7 @@ export default function BookingDetailScreen() {
 
         {/* Details card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Details</Text>
-
+          <Text style={styles.cardLabel}>DETAILS</Text>
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Reference</Text>
             <Text style={styles.rowValue}>#{shortId(booking.id)}</Text>
@@ -110,20 +109,21 @@ export default function BookingDetailScreen() {
         {/* Venue card */}
         {venue && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Venue</Text>
+            <Text style={styles.cardLabel}>VENUE</Text>
             <View style={styles.row}>
               <Text style={styles.rowLabel}>Name</Text>
               <Text style={styles.rowValue}>{venue.name}</Text>
             </View>
             <View style={[styles.row, styles.rowLast]}>
               <Text style={styles.rowLabel}>Address</Text>
-              <Text style={styles.rowValue}>{venue.address}</Text>
+              <Text style={[styles.rowValue, styles.rowValueSmall]}>{venue.address}</Text>
             </View>
           </View>
         )}
 
         {cancelError && (
           <View style={styles.errorBox}>
+            <MaterialIcons name="error-outline" size={16} color={Colors.error} />
             <Text style={styles.errorText}>{cancelError}</Text>
           </View>
         )}
@@ -158,13 +158,11 @@ export default function BookingDetailScreen() {
                   onPress={() => cancelMutation.mutate()}
                   loading={cancelMutation.isPending}
                   variant="danger"
-                  style={styles.modalBtn}
                 />
                 <PrimaryButton
                   title="Keep Booking"
                   onPress={() => setShowCancelModal(false)}
                   variant="outline"
-                  style={styles.modalBtn}
                 />
               </View>
             </TouchableWithoutFeedback>
@@ -176,19 +174,16 @@ export default function BookingDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  headerBar: {
+  safe: { flex: 1, backgroundColor: Colors.background },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    backgroundColor: Colors.card,
+    height: 64,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
   },
   backBtn: {
     width: 40,
@@ -196,106 +191,110 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: {
-    fontSize: 24,
-    color: Colors.navy,
-  },
   headerTitle: {
+    ...T.titleSm,
     fontSize: 17,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
   },
   heroCard: {
-    backgroundColor: Colors.navy,
+    backgroundColor: Colors.primary,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     gap: 12,
   },
   heroCardInactive: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceContainerHigh,
   },
   heroVenueName: {
+    ...T.headlineMd,
     fontSize: 22,
-    fontWeight: '800',
-    color: Colors.textInverse,
-    letterSpacing: -0.3,
+    color: Colors.onPrimary,
   },
   heroVenueNameInactive: {
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
   },
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: 16,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: Colors.navy,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
-  cardTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+  cardLabel: {
+    ...T.labelCaps,
+    color: Colors.secondary,
     marginBottom: 12,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 11,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
+    borderBottomColor: Colors.outlineVariant + '4D',
   },
   rowLast: {
     borderBottomWidth: 0,
   },
   rowLabel: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.onSurfaceVariant,
   },
   rowValue: {
+    ...T.bodyMd,
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.primary,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    textAlign: 'right',
+    flex: 1,
+    marginLeft: 16,
+  },
+  rowValueSmall: {
+    fontSize: 13,
   },
   errorBox: {
-    backgroundColor: Colors.errorBg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: Colors.errorContainer,
     borderRadius: 10,
-    padding: 12,
+    padding: 14,
     marginBottom: 16,
   },
   errorText: {
-    color: Colors.error,
+    ...T.bodyMd,
     fontSize: 13,
+    color: Colors.error,
+    flex: 1,
   },
   cancelBtn: {
-    marginTop: 8,
+    marginTop: 4,
   },
-  errorContainer: {
+  centerFill: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: Colors.card,
+    backgroundColor: Colors.surfaceContainerLowest,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -303,16 +302,16 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   modalTitle: {
+    ...T.headlineMd,
     fontSize: 20,
-    fontWeight: '800',
-    color: Colors.textPrimary,
+    color: Colors.primary,
     marginBottom: 4,
   },
   modalMessage: {
+    ...T.bodyMd,
     fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 21,
+    color: Colors.onSurfaceVariant,
+    lineHeight: 22,
     marginBottom: 8,
   },
-  modalBtn: {},
 });

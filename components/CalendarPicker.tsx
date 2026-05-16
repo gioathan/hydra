@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
+import { T } from '../constants/typography';
 import { formatDateParam } from '../lib/utils';
 import {
   startOfMonth,
@@ -39,26 +41,30 @@ export function CalendarPicker({ selectedDate, onDateChange, minDate }: Calendar
 
   return (
     <View style={styles.container}>
+      {/* Month navigation */}
       <View style={styles.header}>
         <Pressable
           onPress={prevMonth}
           disabled={!canGoPrev}
           style={[styles.navBtn, !canGoPrev && styles.navDisabled]}
+          hitSlop={8}
         >
-          <Text style={styles.navArrow}>‹</Text>
+          <MaterialIcons name="chevron-left" size={22} color={Colors.primary} />
         </Pressable>
         <Text style={styles.monthLabel}>{format(viewMonth, 'MMMM yyyy')}</Text>
-        <Pressable onPress={nextMonth} style={styles.navBtn}>
-          <Text style={styles.navArrow}>›</Text>
+        <Pressable onPress={nextMonth} style={styles.navBtn} hitSlop={8}>
+          <MaterialIcons name="chevron-right" size={22} color={Colors.primary} />
         </Pressable>
       </View>
 
+      {/* Weekday labels */}
       <View style={styles.weekRow}>
         {WEEKDAY_LABELS.map((d) => (
           <Text key={d} style={styles.weekday}>{d}</Text>
         ))}
       </View>
 
+      {/* Day grid */}
       <View style={styles.grid}>
         {Array.from({ length: startWeekday }).map((_, i) => (
           <View key={`empty-${i}`} style={styles.dayCell} />
@@ -72,22 +78,28 @@ export function CalendarPicker({ selectedDate, onDateChange, minDate }: Calendar
             <Pressable
               key={formatDateParam(day)}
               onPress={() => !isDisabled && onDateChange(day)}
-              style={[
-                styles.dayCell,
-                isSelected && styles.dayCellSelected,
-                isToday && !isSelected && styles.dayCellToday,
-              ]}
+              style={styles.dayCell}
+              hitSlop={2}
             >
-              <Text
+              {/* The circle sits inside a fixed-size container so it's always centered */}
+              <View
                 style={[
-                  styles.dayText,
-                  isSelected && styles.dayTextSelected,
-                  isDisabled && styles.dayTextDisabled,
-                  isToday && !isSelected && styles.dayTextToday,
+                  styles.dayCircle,
+                  isSelected && styles.dayCircleSelected,
+                  isToday && !isSelected && styles.dayCircleToday,
                 ]}
               >
-                {format(day, 'd')}
-              </Text>
+                <Text
+                  style={[
+                    styles.dayText,
+                    isSelected && styles.dayTextSelected,
+                    isDisabled && styles.dayTextDisabled,
+                    isToday && !isSelected && styles.dayTextToday,
+                  ]}
+                >
+                  {format(day, 'd')}
+                </Text>
+              </View>
             </Pressable>
           );
         })}
@@ -96,11 +108,15 @@ export function CalendarPicker({ selectedDate, onDateChange, minDate }: Calendar
   );
 }
 
+const CIRCLE_SIZE = 36;
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.card,
+    backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: 16,
     padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '4D',
   },
   header: {
     flexDirection: 'row',
@@ -109,9 +125,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   monthLabel: {
+    ...T.titleSm,
     fontSize: 15,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    color: Colors.primary,
   },
   navBtn: {
     width: 36,
@@ -119,60 +135,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
-    backgroundColor: Colors.borderLight,
+    backgroundColor: Colors.surfaceContainerHigh,
   },
-  navDisabled: {
-    opacity: 0.3,
-  },
-  navArrow: {
-    fontSize: 22,
-    color: Colors.navy,
-    lineHeight: 28,
-  },
+  navDisabled: { opacity: 0.3 },
   weekRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   weekday: {
-    flex: 1,
+    width: `${100 / 7}%`,
     textAlign: 'center',
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textMuted,
+    ...T.labelCaps,
+    fontSize: 11,
+    color: Colors.outline,
     paddingVertical: 4,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  // Cell occupies 1/7 of the row; does NOT have the circle background
   dayCell: {
     width: `${100 / 7}%`,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 99,
   },
-  dayCellSelected: {
-    backgroundColor: Colors.navy,
+  // Fixed-size circle centered inside the cell
+  dayCircle: {
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    borderRadius: CIRCLE_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  dayCellToday: {
-    backgroundColor: Colors.overlayLight,
+  dayCircleSelected: {
+    backgroundColor: Colors.primary,
+  },
+  dayCircleToday: {
+    backgroundColor: Colors.primaryContainer + '33',
   },
   dayText: {
+    ...T.bodyMd,
     fontSize: 14,
-    fontWeight: '500',
-    color: Colors.textPrimary,
+    color: Colors.onSurface,
+    lineHeight: CIRCLE_SIZE,
+    textAlign: 'center',
   },
   dayTextSelected: {
-    color: Colors.textInverse,
-    fontWeight: '700',
+    color: Colors.onPrimary,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   dayTextDisabled: {
-    color: Colors.textMuted,
+    color: Colors.outline,
     opacity: 0.4,
   },
   dayTextToday: {
-    color: Colors.navy,
-    fontWeight: '700',
+    color: Colors.primary,
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
 });
