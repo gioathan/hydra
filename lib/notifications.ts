@@ -76,6 +76,12 @@ export function setupNotificationResponseListener(): () => void {
   try {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as Record<string, unknown>;
+      if (data?.type === 'rating_prompt') {
+        const venueId = data.venueId as string;
+        const bookingId = data.bookingId as string;
+        router.push({ pathname: '/(app)/venues/[id]/rate', params: { id: venueId, bookingId } });
+        return;
+      }
       const bookingId = data?.bookingId as string | undefined;
       if (bookingId) {
         router.push(`/(app)/bookings/${bookingId}`);

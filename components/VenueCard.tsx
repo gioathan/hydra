@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { T } from '../constants/typography';
 import { VenuePlaceholder } from './VenuePlaceholder';
+import { StarRating } from './StarRating';
 import type { VenueDto, VenueTypeDto } from '../types';
 
 interface VenueCardProps {
@@ -43,6 +44,7 @@ export function VenueCard({ venue, venueType, onPress, onBook }: VenueCardProps)
             <MaterialIcons name="location-on" size={14} color={Colors.onSurfaceVariant} />
             <Text style={styles.address} numberOfLines={1}>{venue.address}</Text>
           </View>
+          <StarRating rating={venue.averageRating} count={venue.ratingCount} size={13} />
         </View>
 
         <Pressable

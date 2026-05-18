@@ -18,7 +18,7 @@ import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
 import { login } from '../../lib/api/auth';
 import { useAuthStore } from '../../lib/store/authStore';
-import { saveToken, saveUser, saveCustomerId } from '../../lib/secureStore';
+import { saveToken, saveUser, saveCustomerId, getPendingUserId } from '../../lib/secureStore';
 import { registerForPushNotifications } from '../../lib/notifications';
 import { getAxiosErrorMessage } from '../../lib/utils';
 
@@ -43,7 +43,15 @@ export default function LoginScreen() {
       await registerForPushNotifications(data.customerId);
       router.replace('/(app)');
     },
-    onError: (err) => {
+    onError: async (err: any) => {
+      if (err?.response?.status === 403) {
+        const userId = err?.response?.data?.userId ?? await getPendingUserId() ?? '';
+        router.push({
+          pathname: '/(auth)/verify-email',
+          params: { userId, email: email.trim() },
+        });
+        return;
+      }
       setError(getAxiosErrorMessage(err, 'Invalid email or password.'));
     },
   });
@@ -104,7 +112,9 @@ export default function LoginScreen() {
             <View style={styles.fieldGroup}>
               <View style={styles.labelRow}>
                 <Text style={styles.fieldLabel}>Password</Text>
-                <Text style={styles.forgotLink}>Forgot?</Text>
+                <Pressable onPress={() => router.push('/(auth)/forgot-password')} hitSlop={8}>
+                  <Text style={styles.forgotLink}>Forgot?</Text>
+                </Pressable>
               </View>
               <View style={styles.inputWrapper}>
                 <TextInput

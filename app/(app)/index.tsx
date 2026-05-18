@@ -6,10 +6,10 @@ import {
   ScrollView,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   RefreshControl,
   Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,22 +21,18 @@ import { Avatar } from '../../components/Avatar';
 import { getVenues } from '../../lib/api/venues';
 import { getVenueTypes } from '../../lib/api/venueTypes';
 import { getCustomer } from '../../lib/api/customers';
+import { getPendingRatings } from '../../lib/api/ratings';
 import { useAuthStore } from '../../lib/store/authStore';
-import type { VenueDto, VenueTypeDto } from '../../types';
+import type { VenueDto, VenueTypeDto, PendingRatingDto } from '../../types';
 
 const PAGE_SIZE = 25;
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
-}
 
 export default function HomeScreen() {
   const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [dismissedRatings, setDismissedRatings] = useState<Set<string>>(new Set());
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { customerId } = useAuthStore();
 
@@ -46,6 +42,14 @@ export default function HomeScreen() {
     debounceTimer.current = setTimeout(() => setDebouncedSearch(searchText.trim()), 400);
     return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
   }, [searchText]);
+
+  const { data: pendingRatings = [] } = useQuery({
+    queryKey: ['pendingRatings'],
+    queryFn: getPendingRatings,
+    enabled: !!customerId,
+  });
+
+  const visibleRatings = pendingRatings.filter((r) => !dismissedRatings.has(r.bookingId));
 
   const { data: customer } = useQuery({
     queryKey: ['customer', customerId],
@@ -106,27 +110,15 @@ export default function HomeScreen() {
     [typeMap]
   );
 
-  const firstName = customer?.name?.split(' ')[0] ?? '';
-
   return (
     <SafeAreaView style={styles.safe}>
       {/* Fixed header */}
       <View style={styles.header}>
-        <Pressable hitSlop={8}>
-          <MaterialIcons name="menu" size={24} color={Colors.primary} />
-        </Pressable>
+        <View style={{ width: 32 }} />
         <Text style={styles.brand}>HYDRA</Text>
         <Pressable onPress={() => router.push('/(app)/profile')} hitSlop={8}>
           <Avatar name={customer?.name} size={32} fontSize={14} />
         </Pressable>
-      </View>
-
-      {/* Greeting */}
-      <View style={styles.greeting}>
-        <Text style={styles.greetingLabel}>WELCOME BACK</Text>
-        <Text style={styles.greetingHeadline}>
-          {getGreeting()}{firstName ? `, ${firstName}` : ''}
-        </Text>
       </View>
 
       {/* Search bar */}
@@ -149,6 +141,29 @@ export default function HomeScreen() {
           </Pressable>
         )}
       </View>
+
+      {/* Pending rating prompts */}
+      {visibleRatings.map((item) => (
+        <Pressable
+          key={item.bookingId}
+          style={({ pressed }) => [styles.ratingBanner, pressed && styles.pressed]}
+          onPress={() => router.push({
+            pathname: '/(app)/venues/[id]/rate',
+            params: { id: item.venueId, bookingId: item.bookingId, venueName: item.venueName },
+          })}
+        >
+          <MaterialIcons name="star" size={18} color={Colors.secondary} />
+          <Text style={styles.ratingBannerText} numberOfLines={1}>
+            Rate your visit to <Text style={styles.ratingBannerVenue}>{item.venueName}</Text>
+          </Text>
+          <Pressable
+            onPress={() => setDismissedRatings((s) => new Set(s).add(item.bookingId))}
+            hitSlop={8}
+          >
+            <MaterialIcons name="close" size={16} color={Colors.onSurfaceVariant} />
+          </Pressable>
+        </Pressable>
+      ))}
 
       {/* Venue type tabs */}
       <View style={styles.tabsWrapper}>
@@ -249,25 +264,11 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
 
-  greeting: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 14,
-  },
-  greetingLabel: {
-    ...T.labelCaps,
-    color: Colors.secondary,
-    marginBottom: 4,
-  },
-  greetingHeadline: {
-    ...T.headlineMd,
-    color: Colors.primary,
-  },
-
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 20,
+    marginTop: 16,
     marginBottom: 4,
     backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: 12,
@@ -285,6 +286,26 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
+  ratingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 20,
+    marginTop: 8,
+    backgroundColor: Colors.secondaryFixed,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  ratingBannerText: {
+    ...T.bodyMd,
+    fontSize: 13,
+    color: Colors.onSecondaryFixed,
+    flex: 1,
+  },
+  ratingBannerVenue: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
   tabsWrapper: {
     position: 'relative',
     marginTop: 8,

@@ -16,6 +16,7 @@ import { PhotoSlider } from '../../../../components/PhotoSlider';
 import { CalendarPicker } from '../../../../components/CalendarPicker';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { LoadingSpinner } from '../../../../components/LoadingSpinner';
+import { StarRating } from '../../../../components/StarRating';
 import { getVenue, getAvailability } from '../../../../lib/api/venues';
 import { getVenueTypes } from '../../../../lib/api/venueTypes';
 import { formatDateParam } from '../../../../lib/utils';
@@ -110,6 +111,7 @@ export default function VenueDetailScreen() {
               <MaterialIcons name="people" size={16} color={Colors.onSurfaceVariant} />
               <Text style={styles.metaText}>Up to {venue.capacity} guests</Text>
             </View>
+            <StarRating rating={venue.averageRating} count={venue.ratingCount} size={15} />
           </View>
 
           <View style={styles.divider} />

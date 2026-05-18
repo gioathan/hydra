@@ -2,6 +2,7 @@ export interface UserDto {
   id: string;
   email: string;
   role: 'Customer';
+  isEmailVerified: boolean;
 }
 
 export interface CustomerDto {
@@ -29,6 +30,20 @@ export interface VenueDto {
   userId: string;
   venueTypeId: string;
   photos: VenuePhotoDto[];
+  averageRating: number;
+  ratingCount: number;
+}
+
+export interface PendingRatingDto {
+  venueId: string;
+  venueName: string;
+  bookingId: string;
+  bookingEndUtc: string;
+}
+
+export interface RateVenueRequest {
+  bookingId: string;
+  value: number;
 }
 
 export interface VenueTypeDto {
@@ -118,5 +133,24 @@ export interface UpdateCustomerRequest {
 
 export interface UpdatePasswordRequest {
   currentPassword: string;
+  newPassword: string;
+}
+
+export interface VerifyEmailRequest {
+  userId: string;
+  code: string;
+}
+
+export interface ResendVerificationRequest {
+  userId: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
   newPassword: string;
 }

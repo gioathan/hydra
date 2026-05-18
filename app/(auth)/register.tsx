@@ -17,9 +17,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
 import { registerCustomer } from '../../lib/api/auth';
-import { useAuthStore } from '../../lib/store/authStore';
-import { saveToken, saveUser, saveCustomerId } from '../../lib/secureStore';
-import { registerForPushNotifications } from '../../lib/notifications';
+import { saveUser, savePendingUserId } from '../../lib/secureStore';
 import { validatePassword, getAxiosErrorMessage } from '../../lib/utils';
 
 interface FieldErrors {
@@ -104,18 +102,17 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
-  const { setAuth } = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: () =>
       registerCustomer({ name: name.trim(), email: email.trim(), phone: phone.trim(), password }),
     onSuccess: async (data) => {
-      await saveToken(data.token);
       await saveUser(data.user);
-      await saveCustomerId(data.customer.id);
-      setAuth(data.token, data.user, data.customer.id);
-      await registerForPushNotifications(data.customer.id);
-      router.replace('/(app)');
+      await savePendingUserId(data.user.id);
+      router.push({
+        pathname: '/(auth)/verify-email',
+        params: { userId: data.user.id, email: data.user.email },
+      });
     },
     onError: (err) => {
       setErrors({ general: getAxiosErrorMessage(err, 'Registration failed. Please try again.') });
