@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
+  View, Text, TextInput, ScrollView, StyleSheet,
+  SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -68,7 +60,8 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* Fixed header */}
+
+        {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
@@ -77,24 +70,23 @@ export default function LoginScreen() {
           <View style={{ width: 24 }} />
         </View>
 
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>Welcome back</Text>
-            <Text style={styles.subtitle}>
-              Please sign in to access your curated island experience.
-            </Text>
-          </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 
-          {/* Form card */}
+          {/* Card */}
           <View style={styles.card}>
+
+            {/* Icon */}
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="sailing" size={28} color={Colors.primary} />
+            </View>
+
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Sign in to your Aegean sanctuary.</Text>
+
             {/* Email */}
             <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>Email</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={styles.fieldLabel}>Email Address</Text>
+              <View style={styles.inputRow}>
                 <TextInput
                   style={styles.input}
                   value={email}
@@ -102,8 +94,8 @@ export default function LoginScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  placeholder="guest@aegean.com"
-                  placeholderTextColor={Colors.outlineVariant}
+                  placeholder="name@example.com"
+                  placeholderTextColor={Colors.outline}
                 />
               </View>
             </View>
@@ -116,7 +108,7 @@ export default function LoginScreen() {
                   <Text style={styles.forgotLink}>Forgot?</Text>
                 </Pressable>
               </View>
-              <View style={styles.inputWrapper}>
+              <View style={styles.inputRow}>
                 <TextInput
                   style={[styles.input, { flex: 1 }]}
                   value={password}
@@ -124,7 +116,7 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  placeholderTextColor={Colors.outlineVariant}
+                  placeholderTextColor={Colors.outline}
                 />
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
                   <MaterialIcons
@@ -147,11 +139,10 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={mutation.isPending}
             >
-              {mutation.isPending ? (
-                <ActivityIndicator size="small" color={Colors.onPrimary} />
-              ) : (
-                <Text style={styles.submitLabel}>Sign In</Text>
-              )}
+              {mutation.isPending
+                ? <ActivityIndicator size="small" color={Colors.onPrimary} />
+                : <Text style={styles.submitLabel}>Sign In</Text>
+              }
             </Pressable>
           </View>
 
@@ -168,10 +159,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  safe: { flex: 1, backgroundColor: Colors.background },
   flex: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -179,52 +167,64 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     height: 64,
-    backgroundColor: 'rgba(251,248,252,0.8)',
+    backgroundColor: 'rgba(251,248,252,0.85)',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.outlineVariant,
   },
   headerBrand: {
     ...T.displayLg,
-    fontSize: 24,
+    fontSize: 22,
     letterSpacing: 8,
     color: Colors.primary,
   },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 32,
     paddingBottom: 40,
     flexGrow: 1,
   },
-  titleSection: {
-    marginBottom: 32,
+  card: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 16,
+    padding: 28,
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '40',
+    gap: 0,
+  },
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   title: {
     ...T.headlineMd,
     color: Colors.primary,
+    textAlign: 'center',
     marginBottom: 6,
   },
   subtitle: {
     ...T.bodyMd,
     fontSize: 14,
     color: Colors.onSurfaceVariant,
-    lineHeight: 22,
-  },
-  card: {
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant + '33',
-    gap: 24,
+    textAlign: 'center',
+    marginBottom: 28,
   },
   fieldGroup: {
+    width: '100%',
     gap: 6,
+    marginBottom: 20,
   },
   labelRow: {
     flexDirection: 'row',
@@ -234,33 +234,35 @@ const styles = StyleSheet.create({
   fieldLabel: {
     ...T.labelCaps,
     color: Colors.onSurfaceVariant,
-    marginLeft: 4,
   },
   forgotLink: {
     ...T.labelCaps,
     fontSize: 10,
-    color: Colors.secondaryContainer,
+    color: Colors.secondary,
   },
-  inputWrapper: {
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surfaceContainerLow,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
     borderBottomWidth: 2,
     borderBottomColor: Colors.outlineVariant,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 12,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   input: {
     ...T.bodyMd,
     color: Colors.onSurface,
     flex: 1,
+    padding: 0,
   },
   errorBox: {
+    width: '100%',
     backgroundColor: Colors.errorContainer,
     borderRadius: 8,
     padding: 12,
+    marginBottom: 8,
   },
   errorText: {
     ...T.labelCaps,
@@ -269,29 +271,32 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   },
   submitBtn: {
+    width: '100%',
     height: 56,
     backgroundColor: Colors.primary,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 8,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 6,
     elevation: 3,
   },
   submitLabel: {
     ...T.buttonText,
     color: Colors.onPrimary,
+    letterSpacing: 1,
   },
   pressed: {
-    opacity: 0.85,
+    opacity: 0.82,
     transform: [{ scale: 0.98 }],
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 32,
+    marginTop: 28,
   },
   footerText: {
     ...T.bodyMd,

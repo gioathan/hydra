@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
+  View, Text, TextInput, ScrollView, StyleSheet,
+  SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -28,36 +20,21 @@ interface FieldErrors {
   general?: string;
 }
 
-function AegeanInput({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType,
-  autoCapitalize,
-  autoComplete,
-  secureTextEntry,
-  showToggle,
-  error,
+function Field({
+  label, value, onChangeText, placeholder, keyboardType, autoCapitalize,
+  autoComplete, secureTextEntry, showToggle, error,
 }: {
-  label: string;
-  value: string;
-  onChangeText: (v: string) => void;
-  placeholder?: string;
-  keyboardType?: any;
-  autoCapitalize?: any;
-  autoComplete?: any;
-  secureTextEntry?: boolean;
-  showToggle?: boolean;
-  error?: string;
+  label: string; value: string; onChangeText: (v: string) => void;
+  placeholder?: string; keyboardType?: any; autoCapitalize?: any;
+  autoComplete?: any; secureTextEntry?: boolean; showToggle?: boolean; error?: string;
 }) {
   const [hidden, setHidden] = useState(secureTextEntry ?? false);
   return (
-    <View style={inputStyles.group}>
-      <Text style={inputStyles.label}>{label}</Text>
-      <View style={inputStyles.row}>
+    <View style={field.group}>
+      <Text style={field.label}>{label}</Text>
+      <View style={field.row}>
         <TextInput
-          style={[inputStyles.input, !showToggle && { flex: 1 }]}
+          style={field.input}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
@@ -77,22 +54,26 @@ function AegeanInput({
           </Pressable>
         )}
       </View>
-      {error && <Text style={inputStyles.error}>{error}</Text>}
+      {error && <Text style={field.error}>{error}</Text>}
     </View>
   );
 }
 
-const inputStyles = StyleSheet.create({
-  group: { gap: 6 },
-  label: { ...T.labelCaps, color: Colors.secondary, marginLeft: 0 },
+const field = StyleSheet.create({
+  group: { gap: 6, marginBottom: 20, width: '100%' },
+  label: { ...T.labelCaps, color: Colors.onSurfaceVariant },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: Colors.surfaceContainerLow,
     borderBottomWidth: 2,
     borderBottomColor: Colors.outlineVariant,
-    paddingBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
-  input: { ...T.bodyMd, color: Colors.onSurface, flex: 1 },
+  input: { ...T.bodyMd, color: Colors.onSurface, flex: 1, padding: 0 },
   error: { ...T.labelCaps, fontSize: 10, color: Colors.error, letterSpacing: 0, textTransform: 'none', marginTop: 2 },
 });
 
@@ -138,6 +119,7 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+
         {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={12}>
@@ -147,54 +129,28 @@ export default function RegisterScreen() {
           <View style={{ width: 24 }} />
         </View>
 
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>Join Us</Text>
-            <Text style={styles.subtitle}>
-              Experience the heritage of Hydra through exclusive access and refined curation.
-            </Text>
-          </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 
-          <View style={styles.form}>
-            <AegeanInput
-              label="FULL NAME"
-              value={name}
-              onChangeText={setName}
-              placeholder="Alexandros Papadopoulos"
-              autoCapitalize="words"
-              error={errors.name}
-            />
-            <AegeanInput
-              label="EMAIL"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="alex@aegean.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email}
-            />
-            <AegeanInput
-              label="PHONE"
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="+30 690 000 0000"
-              keyboardType="phone-pad"
-              error={errors.phone}
-            />
-            <AegeanInput
-              label="PASSWORD"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry
-              showToggle
-              error={errors.password}
-            />
+          {/* Card */}
+          <View style={styles.card}>
+
+            {/* Icon */}
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="person" size={28} color={Colors.primary} />
+            </View>
+
+            <Text style={styles.title}>Join Us</Text>
+            <Text style={styles.subtitle}>Experience the heritage of Hydra through exclusive access.</Text>
+
+            <Field label="FULL NAME" value={name} onChangeText={setName}
+              placeholder="Alexandros Papadopoulos" autoCapitalize="words" error={errors.name} />
+            <Field label="EMAIL" value={email} onChangeText={setEmail}
+              placeholder="alex@example.com" keyboardType="email-address" autoCapitalize="none"
+              autoComplete="email" error={errors.email} />
+            <Field label="PHONE" value={phone} onChangeText={setPhone}
+              placeholder="+30 690 000 0000" keyboardType="phone-pad" error={errors.phone} />
+            <Field label="PASSWORD" value={password} onChangeText={setPassword}
+              placeholder="••••••••" secureTextEntry showToggle error={errors.password} />
 
             {errors.general && (
               <View style={styles.errorBox}>
@@ -207,11 +163,10 @@ export default function RegisterScreen() {
               onPress={handleRegister}
               disabled={mutation.isPending}
             >
-              {mutation.isPending ? (
-                <ActivityIndicator size="small" color={Colors.onPrimary} />
-              ) : (
-                <Text style={styles.submitLabel}>Create Account</Text>
-              )}
+              {mutation.isPending
+                ? <ActivityIndicator size="small" color={Colors.onPrimary} />
+                : <Text style={styles.submitLabel}>Create Account</Text>
+              }
             </Pressable>
           </View>
 
@@ -236,31 +191,66 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     height: 64,
-    backgroundColor: 'rgba(251,248,252,0.8)',
+    backgroundColor: 'rgba(251,248,252,0.85)',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.outlineVariant,
   },
   headerBrand: {
     ...T.displayLg,
-    fontSize: 24,
+    fontSize: 22,
     letterSpacing: 8,
     color: Colors.primary,
   },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 32,
     paddingBottom: 40,
     flexGrow: 1,
   },
-  titleSection: { marginBottom: 40 },
-  title: { ...T.displayLg, color: Colors.primary, marginBottom: 8 },
-  subtitle: { ...T.bodyMd, color: Colors.onSurfaceVariant, lineHeight: 26 },
-  form: { gap: 24 },
+  card: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 16,
+    padding: 28,
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '40',
+  },
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    ...T.headlineMd,
+    color: Colors.primary,
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  subtitle: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginBottom: 28,
+    lineHeight: 22,
+  },
   errorBox: {
+    width: '100%',
     backgroundColor: Colors.errorContainer,
     borderRadius: 8,
     padding: 12,
+    marginBottom: 8,
   },
   errorText: {
     ...T.labelCaps,
@@ -269,22 +259,38 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   },
   submitBtn: {
+    width: '100%',
     height: 56,
     backgroundColor: Colors.primary,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 6,
     elevation: 3,
   },
-  submitLabel: { ...T.buttonText, color: Colors.onPrimary },
-  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 40 },
-  footerText: { ...T.bodyMd, fontSize: 14, color: Colors.onSurfaceVariant },
+  submitLabel: {
+    ...T.buttonText,
+    color: Colors.onPrimary,
+    letterSpacing: 1,
+  },
+  pressed: {
+    opacity: 0.82,
+    transform: [{ scale: 0.98 }],
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 28,
+  },
+  footerText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+  },
   footerLink: {
     ...T.bodyMd,
     fontSize: 14,
