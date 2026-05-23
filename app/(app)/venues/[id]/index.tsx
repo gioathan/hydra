@@ -6,6 +6,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Pressable,
+  Linking,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -112,6 +113,15 @@ export default function VenueDetailScreen() {
               <Text style={styles.metaText}>Up to {venue.capacity} guests</Text>
             </View>
             <StarRating rating={venue.averageRating} count={venue.ratingCount} size={15} />
+            {venue.googleMapsUrl && (
+              <Pressable
+                style={styles.mapsBtn}
+                onPress={() => Linking.openURL(venue.googleMapsUrl!)}
+              >
+                <MaterialIcons name="map" size={16} color={Colors.secondary} />
+                <Text style={styles.mapsBtnText}>Open in Maps</Text>
+              </Pressable>
+            )}
           </View>
 
           <View style={styles.divider} />
@@ -230,6 +240,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurfaceVariant,
     flex: 1,
+  },
+  mapsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  mapsBtnText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.secondary,
+    textDecorationLine: 'underline',
   },
   divider: {
     height: 1,

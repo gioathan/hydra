@@ -6,6 +6,7 @@ const KEYS = {
   customerId: 'hydra_customer_id',
   pushToken: 'hydra_push_token',
   pendingUserId: 'hydra_pending_user_id',
+  location: 'hydra_location',
 } as const;
 
 export async function saveToken(token: string) {
@@ -60,6 +61,18 @@ export async function getPushToken(): Promise<string | null> {
 
 export async function deletePushToken() {
   await SecureStore.deleteItemAsync(KEYS.pushToken);
+}
+
+export async function saveLocation(location: string) {
+  await SecureStore.setItemAsync(KEYS.location, location);
+}
+
+export async function getLocation(): Promise<string | null> {
+  return SecureStore.getItemAsync(KEYS.location);
+}
+
+export async function deleteLocation() {
+  await SecureStore.deleteItemAsync(KEYS.location);
 }
 
 export async function clearAll() {

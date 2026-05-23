@@ -5,7 +5,8 @@ export async function getVenues(
   page = 1,
   pageSize = 25,
   venueTypeId?: string | null,
-  name?: string
+  name?: string,
+  location?: string | null
 ): Promise<PagedResult<VenueDto>> {
   const { data } = await apiClient.get<PagedResult<VenueDto>>('/venues', {
     params: {
@@ -13,8 +14,14 @@ export async function getVenues(
       pageSize,
       ...(venueTypeId ? { venueTypeId } : {}),
       ...(name ? { name } : {}),
+      ...(location ? { location } : {}),
     },
   });
+  return data;
+}
+
+export async function getVenueLocations(): Promise<string[]> {
+  const { data } = await apiClient.get<string[]>('/venues/locations');
   return data;
 }
 

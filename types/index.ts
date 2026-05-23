@@ -32,6 +32,10 @@ export interface VenueDto {
   photos: VenuePhotoDto[];
   averageRating: number;
   ratingCount: number;
+  location: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  googleMapsUrl: string | null;
 }
 
 export interface PendingRatingDto {

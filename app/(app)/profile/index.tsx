@@ -121,6 +121,24 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Legal */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>LEGAL</Text>
+          <View style={styles.menuGroup}>
+            <MenuRow
+              icon="privacy-tip"
+              label="Privacy Policy"
+              onPress={() => router.push('/(app)/profile/privacy-policy' as any)}
+            />
+            <View style={styles.separator} />
+            <MenuRow
+              icon="description"
+              label="Terms of Service"
+              onPress={() => router.push('/(app)/profile/terms-of-service' as any)}
+            />
+          </View>
+        </View>
+
         {/* Sign out */}
         <View style={styles.section}>
           <View style={styles.menuGroup}>

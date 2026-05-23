@@ -8,6 +8,8 @@ import {
   StyleSheet,
   RefreshControl,
   Pressable,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -18,15 +20,68 @@ import { T } from '../../constants/typography';
 import { VenueCard } from '../../components/VenueCard';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { Avatar } from '../../components/Avatar';
-import { getVenues } from '../../lib/api/venues';
+import { getVenues, getVenueLocations } from '../../lib/api/venues';
 import { getVenueTypes } from '../../lib/api/venueTypes';
 import { getCustomer } from '../../lib/api/customers';
 import { getPendingRatings } from '../../lib/api/ratings';
 import { useAuthStore } from '../../lib/store/authStore';
+import { getLocation, saveLocation } from '../../lib/secureStore';
 import type { VenueDto, VenueTypeDto, PendingRatingDto } from '../../types';
 
 const PAGE_SIZE = 25;
 
+
+// ─── Location Picker Modal ────────────────────────────────────────
+
+function LocationPickerModal({
+  visible,
+  locations,
+  loading,
+  onSelect,
+}: {
+  visible: boolean;
+  locations: string[];
+  loading: boolean;
+  onSelect: (loc: string) => void;
+}) {
+  return (
+    <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
+      <View style={modal.overlay}>
+        <View style={modal.card}>
+          <Text style={modal.brand}>HYDRA</Text>
+
+          <View style={modal.textBlock}>
+            <Text style={modal.label}>WELCOME</Text>
+            <Text style={modal.title}>Where are you visiting?</Text>
+            <Text style={modal.subtitle}>Choose a location to discover venues</Text>
+          </View>
+
+          {loading ? (
+            <ActivityIndicator color={Colors.primary} size="large" style={{ marginTop: 8 }} />
+          ) : (
+            <View style={modal.list}>
+              {locations.map((loc) => (
+                <Pressable
+                  key={loc}
+                  style={({ pressed }) => [modal.locationBtn, pressed && { opacity: 0.85 }]}
+                  onPress={() => onSelect(loc)}
+                >
+                  <View style={modal.locationBtnInner}>
+                    <MaterialIcons name="location-on" size={20} color="rgba(255,255,255,0.7)" />
+                    <Text style={modal.locationText}>{loc}</Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={20} color="rgba(255,255,255,0.5)" />
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────
 
 export default function HomeScreen() {
   const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
@@ -36,7 +91,29 @@ export default function HomeScreen() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { customerId } = useAuthStore();
 
-  // Debounce search input — wait 400ms after user stops typing
+  // Location state
+  const [location, setLocation] = useState<string | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [locationReady, setLocationReady] = useState(false);
+
+  useEffect(() => {
+    getLocation().then((saved) => {
+      if (saved) {
+        setLocation(saved);
+      } else {
+        setShowLocationPicker(true);
+      }
+      setLocationReady(true);
+    });
+  }, []);
+
+  const handleSelectLocation = useCallback(async (loc: string) => {
+    await saveLocation(loc);
+    setLocation(loc);
+    setShowLocationPicker(false);
+  }, []);
+
+  // Debounce search input
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => setDebouncedSearch(searchText.trim()), 400);
@@ -50,6 +127,13 @@ export default function HomeScreen() {
   });
 
   const visibleRatings = pendingRatings.filter((r) => !dismissedRatings.has(r.bookingId));
+
+  const { data: locationsList, isLoading: locationsLoading } = useQuery({
+    queryKey: ['venueLocations'],
+    queryFn: getVenueLocations,
+    staleTime: 10 * 60_000,
+    enabled: showLocationPicker,
+  });
 
   const { data: customer } = useQuery({
     queryKey: ['customer', customerId],
@@ -76,12 +160,13 @@ export default function HomeScreen() {
     refetch,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: ['venues', selectedTypeId, debouncedSearch],
+    queryKey: ['venues', selectedTypeId, debouncedSearch, location],
     queryFn: ({ pageParam = 1 }) =>
-      getVenues(pageParam as number, PAGE_SIZE, selectedTypeId, debouncedSearch || undefined),
+      getVenues(pageParam as number, PAGE_SIZE, selectedTypeId, debouncedSearch || undefined, location),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.pageNumber + 1 : undefined,
+    enabled: locationReady && !!location,
   });
 
   const venues: VenueDto[] = useMemo(
@@ -112,10 +197,25 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Location picker modal */}
+      <LocationPickerModal
+        visible={showLocationPicker}
+        locations={locationsList ?? []}
+        loading={locationsLoading}
+        onSelect={handleSelectLocation}
+      />
+
       {/* Fixed header */}
       <View style={styles.header}>
-        <View style={{ width: 32 }} />
+        <Pressable style={styles.locationChip} onPress={() => setShowLocationPicker(true)} hitSlop={8}>
+          <MaterialIcons name="location-on" size={14} color={Colors.secondary} />
+          {location && (
+            <Text style={styles.locationChipText}>{location}</Text>
+          )}
+        </Pressable>
+
         <Text style={styles.brand}>HYDRA</Text>
+
         <Pressable onPress={() => router.push('/(app)/profile')} hitSlop={8}>
           <Avatar name={customer?.name} size={32} fontSize={14} />
         </Pressable>
@@ -244,6 +344,77 @@ export default function HomeScreen() {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────
+
+const modal = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(4,22,53,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: Colors.background,
+    borderRadius: 28,
+    padding: 28,
+    alignItems: 'center',
+    gap: 20,
+  },
+  brand: {
+    ...T.displayLg,
+    fontSize: 22,
+    letterSpacing: 8,
+    color: Colors.primary,
+  },
+  textBlock: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  label: {
+    ...T.labelCaps,
+    color: Colors.secondary,
+    marginBottom: 4,
+  },
+  title: {
+    ...T.headlineMd,
+    color: Colors.primary,
+    textAlign: 'center',
+  },
+  subtitle: {
+    ...T.bodyMd,
+    fontSize: 13,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  list: {
+    width: '100%',
+    gap: 10,
+  },
+  locationBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  locationBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  locationText: {
+    ...T.buttonText,
+    fontSize: 16,
+    color: '#ffffff',
+  },
+});
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
@@ -256,6 +427,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(251,248,252,0.97)',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.outlineVariant,
+  },
+  locationChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 99,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+  },
+  locationChipText: {
+    ...T.labelCaps,
+    fontSize: 11,
+    color: Colors.primary,
+    textTransform: 'none',
   },
   brand: {
     ...T.displayLg,
@@ -305,6 +492,9 @@ const styles = StyleSheet.create({
   },
   ratingBannerVenue: {
     fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  pressed: {
+    opacity: 0.85,
   },
   tabsWrapper: {
     position: 'relative',
