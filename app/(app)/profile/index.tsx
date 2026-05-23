@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Pressable,
   Alert,
+  Linking,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -117,6 +118,18 @@ export default function ProfileScreen() {
               icon="event-note"
               label="My Bookings"
               onPress={() => router.push('/(app)/bookings')}
+            />
+          </View>
+        </View>
+
+        {/* Support */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>SUPPORT</Text>
+          <View style={styles.menuGroup}>
+            <MenuRow
+              icon="mail-outline"
+              label="Contact Us"
+              onPress={() => Linking.openURL('mailto:test@email.com')}
             />
           </View>
         </View>

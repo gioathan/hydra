@@ -91,6 +91,7 @@ export interface BookingDto {
   endUtc: string;
   partySize: number;
   status: BookingStatus;
+  venueComment: string | null;
   createdAtUtc: string;
   updatedAtUtc: string;
 }

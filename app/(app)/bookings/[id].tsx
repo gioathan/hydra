@@ -121,6 +121,16 @@ export default function BookingDetailScreen() {
           </View>
         )}
 
+        {booking.venueComment && (
+          <View style={styles.commentCard}>
+            <MaterialIcons name="chat-bubble-outline" size={18} color={Colors.statusPending} style={{ marginTop: 1 }} />
+            <View style={styles.commentBody}>
+              <Text style={styles.commentLabel}>MESSAGE FROM {(venue?.name ?? 'VENUE').toUpperCase()}</Text>
+              <Text style={styles.commentText}>{booking.venueComment}</Text>
+            </View>
+          </View>
+        )}
+
         {cancelError && (
           <View style={styles.errorBox}>
             <MaterialIcons name="error-outline" size={16} color={Colors.error} />
@@ -264,6 +274,33 @@ const styles = StyleSheet.create({
   },
   rowValueSmall: {
     fontSize: 13,
+  },
+  commentCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    backgroundColor: Colors.statusPendingBg,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#fde68a',
+  },
+  commentBody: {
+    flex: 1,
+    gap: 4,
+  },
+  commentLabel: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.statusPending,
+    marginBottom: 4,
+  },
+  commentText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: '#92400e',
+    lineHeight: 22,
   },
   errorBox: {
     flexDirection: 'row',
