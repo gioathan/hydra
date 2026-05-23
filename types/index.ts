@@ -36,6 +36,7 @@ export interface VenueDto {
   latitude: number | null;
   longitude: number | null;
   googleMapsUrl: string | null;
+  description: string | null;
 }
 
 export interface PendingRatingDto {

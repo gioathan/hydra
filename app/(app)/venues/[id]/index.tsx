@@ -124,6 +124,16 @@ export default function VenueDetailScreen() {
             )}
           </View>
 
+          {venue.description && (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>ABOUT</Text>
+                <Text style={styles.descriptionText}>{venue.description}</Text>
+              </View>
+            </>
+          )}
+
           <View style={styles.divider} />
 
           {/* Date picker */}
@@ -317,5 +327,11 @@ const styles = StyleSheet.create({
   },
   slotsBtn: {
     marginTop: 24,
+  },
+  descriptionText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+    lineHeight: 22,
   },
 });
