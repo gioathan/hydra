@@ -83,6 +83,7 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [_trap, setTrap] = useState('');
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -112,6 +113,7 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = () => {
+    if (_trap) return;
     setErrors({});
     if (validate()) mutation.mutate();
   };
@@ -140,15 +142,15 @@ export default function RegisterScreen() {
             </View>
 
             <Text style={styles.title}>Join Us</Text>
-            <Text style={styles.subtitle}>Experience the heritage of Hydra through exclusive access.</Text>
+            <Text style={styles.subtitle}>Create an account and start booking restaurants, bars and activities.</Text>
 
             <Field label="FULL NAME" value={name} onChangeText={setName}
-              placeholder="Alexandros Papadopoulos" autoCapitalize="words" error={errors.name} />
+              placeholder="Alex Johnson" autoCapitalize="words" error={errors.name} />
             <Field label="EMAIL" value={email} onChangeText={setEmail}
               placeholder="alex@example.com" keyboardType="email-address" autoCapitalize="none"
               autoComplete="email" error={errors.email} />
             <Field label="PHONE" value={phone} onChangeText={setPhone}
-              placeholder="+30 690 000 0000" keyboardType="phone-pad" error={errors.phone} />
+              placeholder="+1 555 000 0000" keyboardType="phone-pad" error={errors.phone} />
             <Field label="PASSWORD" value={password} onChangeText={setPassword}
               placeholder="••••••••" secureTextEntry showToggle error={errors.password} />
 
@@ -157,6 +159,8 @@ export default function RegisterScreen() {
                 <Text style={styles.errorText}>{errors.general}</Text>
               </View>
             )}
+
+            <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
 
             <Pressable
               style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
@@ -261,14 +265,14 @@ const styles = StyleSheet.create({
   submitBtn: {
     width: '100%',
     height: 56,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
-    shadowColor: Colors.primary,
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 3,
   },
@@ -277,6 +281,7 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
     letterSpacing: 1,
   },
+  trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
   pressed: {
     opacity: 0.82,
     transform: [{ scale: 0.98 }],

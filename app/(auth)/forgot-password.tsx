@@ -14,6 +14,7 @@ import { getAxiosErrorMessage } from '../../lib/utils';
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [_trap, setTrap] = useState('');
 
   const mutation = useMutation({
     mutationFn: () => forgotPassword({ email: email.trim() }),
@@ -26,6 +27,7 @@ export default function ForgotPasswordScreen() {
   });
 
   const handleSubmit = () => {
+    if (_trap) return;
     setError(null);
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address.');
@@ -84,6 +86,8 @@ export default function ForgotPasswordScreen() {
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
+
+            <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
 
             <Pressable
               style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
@@ -214,14 +218,14 @@ const styles = StyleSheet.create({
   submitBtn: {
     width: '100%',
     height: 56,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
-    shadowColor: Colors.primary,
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 3,
   },
@@ -230,6 +234,7 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
     letterSpacing: 1,
   },
+  trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
   pressed: {
     opacity: 0.82,
     transform: [{ scale: 0.98 }],

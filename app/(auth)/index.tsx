@@ -4,132 +4,244 @@ import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
 
-function DecorativeCompass() {
+function SchedulePreview() {
   return (
-    <View style={compass.root}>
-      {/* Rotated background card */}
-      <View style={compass.card} />
+    <View style={sp.container}>
+      <View style={sp.header}>
+        <View style={sp.headerLine} />
+        <Text style={sp.headerLabel}>SCHEDULE</Text>
+      </View>
 
-      {/* Corner brackets */}
-      <View style={[compass.corner, compass.cornerTL]} />
-      <View style={[compass.corner, compass.cornerTR]} />
-      <View style={[compass.corner, compass.cornerBL]} />
-      <View style={[compass.corner, compass.cornerBR]} />
+      <Text style={sp.dayLabel}>Today · May 24</Text>
 
-      {/* Compass circles */}
-      <View style={compass.ringOuter}>
-        <View style={compass.ringMid}>
-          <View style={compass.ringInner}>
-            <View style={compass.dot} />
+      {/* Entry 1 — Confirmed */}
+      <View style={sp.entry}>
+        <View style={sp.timeCol}>
+          <Text style={sp.time}>19:00</Text>
+          <View style={sp.dotConfirmed} />
+          <View style={sp.line} />
+        </View>
+        <View style={sp.card}>
+          <View style={sp.cardTop}>
+            <Text style={sp.venueName}>The Rooftop Bar</Text>
+            <View style={sp.badgeConfirmed}><Text style={sp.badgeConfirmedText}>Confirmed</Text></View>
           </View>
+          <Text style={sp.venueType}>Cocktail Lounge · Soho</Text>
+          <Text style={sp.meta}>2 guests · Ref #A2F9</Text>
         </View>
       </View>
 
-      {/* Cardinal lines */}
-      <View style={compass.lineV} />
-      <View style={compass.lineH} />
+      {/* Entry 2 — Pending */}
+      <View style={sp.entry}>
+        <View style={sp.timeCol}>
+          <Text style={sp.time}>21:30</Text>
+          <View style={sp.dotPending} />
+          <View style={[sp.line, sp.lineFaded]} />
+        </View>
+        <View style={[sp.card, sp.cardFaded]}>
+          <View style={sp.cardTop}>
+            <Text style={[sp.venueName, sp.nameFaded]}>Sakura Garden</Text>
+            <View style={sp.badgePending}><Text style={sp.badgePendingText}>Pending</Text></View>
+          </View>
+          <Text style={[sp.venueType, sp.venueFaded]}>Japanese · Covent Garden</Text>
+          <Text style={[sp.meta, sp.metaFaded]}>4 guests · Ref #B7C1</Text>
+        </View>
+      </View>
 
-      {/* Cardinal ticks */}
-      <View style={[compass.tick, compass.tickN]} />
-      <View style={[compass.tick, compass.tickS]} />
-      <View style={[compass.tickH, compass.tickE]} />
-      <View style={[compass.tickH, compass.tickW]} />
+      {/* Tomorrow */}
+      <View style={sp.tomorrowBlock}>
+        <Text style={sp.tomorrowLabel}>Tomorrow · May 25</Text>
+        <View style={[sp.entry, { opacity: 0.4 }]}>
+          <View style={sp.timeCol}>
+            <Text style={sp.time}>20:00</Text>
+            <View style={sp.dotOutline} />
+          </View>
+          <View style={[sp.card, sp.cardVeryFaded]}>
+            <View style={sp.cardTop}>
+              <Text style={[sp.venueName, { opacity: 0.5 }]}>La Maison</Text>
+              <View style={sp.badgePendingFaded}><Text style={sp.badgePendingFadedText}>Pending</Text></View>
+            </View>
+            <Text style={[sp.venueType, { opacity: 0.6 }]}>French Bistro · Chelsea</Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
 
-const COMPASS_SIZE = 240;
-const RING_OUTER = 160;
-const RING_MID = 108;
-const RING_INNER = 48;
-
-const compass = StyleSheet.create({
-  root: {
-    width: COMPASS_SIZE,
-    height: COMPASS_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    position: 'absolute',
-    inset: 0,
+const sp = StyleSheet.create({
+  container: {
+    width: 280,
+    backgroundColor: Colors.onSecondaryContainer,
     borderRadius: 20,
-    backgroundColor: Colors.surfaceContainer,
-    transform: [{ rotate: '2deg' }],
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 3,
+    padding: 16,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  corner: {
-    position: 'absolute',
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  headerLine: {
     width: 20,
-    height: 20,
+    height: 1,
+    backgroundColor: Colors.secondaryFixedDim,
   },
-  cornerTL: { top: 14, left: 14, borderTopWidth: 2, borderLeftWidth: 2, borderColor: Colors.secondary + '40' },
-  cornerTR: { top: 14, right: 14, borderTopWidth: 2, borderRightWidth: 2, borderColor: Colors.secondary + '40' },
-  cornerBL: { bottom: 14, left: 14, borderBottomWidth: 2, borderLeftWidth: 2, borderColor: Colors.secondary + '40' },
-  cornerBR: { bottom: 14, right: 14, borderBottomWidth: 2, borderRightWidth: 2, borderColor: Colors.secondary + '40' },
-  ringOuter: {
-    width: RING_OUTER,
-    height: RING_OUTER,
-    borderRadius: RING_OUTER / 2,
-    borderWidth: 1,
-    borderColor: Colors.primary + '18',
+  headerLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: Colors.secondaryFixedDim + 'cc',
+    textTransform: 'uppercase',
+  },
+  dayLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: 'rgba(255,255,255,0.25)',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+    paddingLeft: 46,
+  },
+  entry: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  timeCol: {
+    width: 36,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  ringMid: {
-    width: RING_MID,
-    height: RING_MID,
-    borderRadius: RING_MID / 2,
-    borderWidth: 1,
-    borderColor: Colors.primary + '14',
-    alignItems: 'center',
-    justifyContent: 'center',
+  time: {
+    fontSize: 9,
+    color: 'rgba(255,255,255,0.4)',
+    marginBottom: 4,
   },
-  ringInner: {
-    width: RING_INNER,
-    height: RING_INNER,
-    borderRadius: RING_INNER / 2,
-    borderWidth: 2,
-    borderColor: Colors.secondary + '35',
-    alignItems: 'center',
-    justifyContent: 'center',
+  dotConfirmed: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.secondaryFixedDim,
   },
-  dot: {
+  dotPending: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.secondary + '55',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: 'transparent',
   },
-  lineV: {
-    position: 'absolute',
-    width: 1,
-    height: RING_OUTER,
-    backgroundColor: Colors.primary + '12',
-  },
-  lineH: {
-    position: 'absolute',
-    height: 1,
-    width: RING_OUTER,
-    backgroundColor: Colors.primary + '12',
-  },
-  tick: {
-    position: 'absolute',
-    width: 1,
-    height: 8,
-    backgroundColor: Colors.primary + '25',
-  },
-  tickN: { top: (COMPASS_SIZE - RING_OUTER) / 2 },
-  tickS: { bottom: (COMPASS_SIZE - RING_OUTER) / 2 },
-  tickH: {
-    height: 1,
+  dotOutline: {
     width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'transparent',
   },
-  tickE: { right: (COMPASS_SIZE - RING_OUTER) / 2 },
-  tickW: { left: (COMPASS_SIZE - RING_OUTER) / 2 },
+  line: {
+    flex: 1,
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginTop: 4,
+    minHeight: 12,
+  },
+  lineFaded: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  card: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 10,
+  },
+  cardFaded: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'rgba(255,255,255,0.07)',
+    marginBottom: 6,
+  },
+  cardVeryFaded: {
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderColor: 'rgba(255,255,255,0.05)',
+    marginBottom: 0,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 4,
+    marginBottom: 4,
+  },
+  venueName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#ffffff',
+    flex: 1,
+  },
+  nameFaded: { color: 'rgba(255,255,255,0.65)' },
+  venueType: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.38)',
+    marginBottom: 4,
+  },
+  venueFaded: { color: 'rgba(255,255,255,0.28)' },
+  meta: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.22)',
+  },
+  metaFaded: { color: 'rgba(255,255,255,0.16)' },
+  badgeConfirmed: {
+    backgroundColor: 'rgba(21,128,61,0.22)',
+    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgeConfirmedText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#4ade80',
+  },
+  badgePending: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgePendingText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: 'rgba(251,191,36,0.9)',
+  },
+  badgePendingFaded: {
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgePendingFadedText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: 'rgba(251,191,36,0.55)',
+  },
+  tomorrowBlock: {
+    opacity: 0.7,
+  },
+  tomorrowLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: 'rgba(255,255,255,0.18)',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+    paddingLeft: 46,
+  },
 });
 
 export default function SplashScreen() {
@@ -142,17 +254,17 @@ export default function SplashScreen() {
           <Text style={styles.brand}>HYDRA</Text>
         </View>
 
-        {/* Decorative compass */}
-        <DecorativeCompass />
+        {/* Schedule preview */}
+        <SchedulePreview />
 
         {/* Copy */}
         <View style={styles.copySection}>
           <Text style={styles.headline}>
-            Timeless Elegance{'\n'}
-            <Text style={styles.headlineAccent}>in Every Detail.</Text>
+            Find, Book{'\n'}
+            <Text style={styles.headlineAccent}>&amp; Enjoy.</Text>
           </Text>
           <Text style={styles.tagline}>
-            Experience the quiet luxury of Hydra&apos;s most exclusive venues and cultural heritage.
+            Browse restaurants, bars, cafés and activities. Book your next experience in seconds.
           </Text>
         </View>
 
@@ -173,12 +285,6 @@ export default function SplashScreen() {
           </Pressable>
         </View>
 
-        {/* Footer accent */}
-        <View style={styles.footerRow}>
-          <View style={styles.footerLine} />
-          <Text style={styles.footerText}>EST. 1960</Text>
-          <View style={styles.footerLine} />
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -235,13 +341,13 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     height: 56,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: Colors.primary,
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -253,33 +359,16 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.primary,
+    borderColor: Colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryLabel: {
     ...T.buttonText,
-    color: Colors.primary,
+    color: Colors.secondary,
   },
   pressed: {
     opacity: 0.82,
     transform: [{ scale: 0.98 }],
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    opacity: 0.35,
-  },
-  footerLine: {
-    width: 28,
-    height: 1,
-    backgroundColor: Colors.outline,
-  },
-  footerText: {
-    ...T.labelCaps,
-    fontSize: 10,
-    color: Colors.outline,
-    letterSpacing: 2,
   },
 });

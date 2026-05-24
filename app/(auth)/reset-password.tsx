@@ -18,6 +18,7 @@ export default function ResetPasswordScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [_trap, setTrap] = useState('');
 
   const mutation = useMutation({
     mutationFn: () => resetPassword({ email: email ?? '', code, newPassword }),
@@ -30,6 +31,7 @@ export default function ResetPasswordScreen() {
   });
 
   const handleSubmit = () => {
+    if (_trap) return;
     setError(null);
     if (code.length !== 6) {
       setError('Please enter the full 6-digit code.');
@@ -104,6 +106,8 @@ export default function ResetPasswordScreen() {
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
+
+            <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
 
             <Pressable
               style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
@@ -191,16 +195,17 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     height: 56,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: Colors.primary,
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
   },
   submitLabel: { ...T.buttonText, color: Colors.onPrimary },
+  trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
 });
