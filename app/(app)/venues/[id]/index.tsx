@@ -8,7 +8,10 @@ import {
   Pressable,
   Linking,
   Modal,
+  Dimensions,
 } from 'react-native';
+
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -141,8 +144,9 @@ export default function VenueDetailScreen() {
               <View style={styles.divider} />
               <Pressable style={styles.pricingBtn} onPress={() => setPricingOpen(true)}>
                 <MaterialIcons name="receipt-long" size={18} color={Colors.secondary} />
-                <Text style={styles.pricingBtnText}>Menu &amp; Pricing</Text>
-                <MaterialIcons name="chevron-right" size={18} color={Colors.secondary} style={{ marginLeft: 'auto' }} />
+                <Text style={styles.pricingBtnText}>Menu & Pricing</Text>
+                <View style={styles.pricingBtnSpacer} />
+                <MaterialIcons name="chevron-right" size={18} color={Colors.secondary} />
               </Pressable>
             </>
           )}
@@ -207,20 +211,21 @@ export default function VenueDetailScreen() {
         transparent
         onRequestClose={() => setPricingOpen(false)}
       >
-        <Pressable style={m.backdrop} onPress={() => setPricingOpen(false)}>
-          <Pressable style={m.sheet} onPress={() => {}}>
-            {/* Handle */}
+        <View style={m.container}>
+          {/* Backdrop tap-to-dismiss */}
+          <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setPricingOpen(false)} />
+
+          {/* Sheet */}
+          <View style={m.sheet}>
             <View style={m.handle} />
 
-            {/* Header */}
             <View style={m.header}>
-              <Text style={m.headerTitle}>Menu &amp; Pricing</Text>
+              <Text style={m.headerTitle}>Menu & Pricing</Text>
               <Pressable onPress={() => setPricingOpen(false)} hitSlop={12}>
                 <MaterialIcons name="close" size={22} color={Colors.onSurfaceVariant} />
               </Pressable>
             </View>
 
-            {/* Scrollable content */}
             <ScrollView style={m.scroll} contentContainerStyle={m.scrollContent} showsVerticalScrollIndicator={false}>
               {(() => {
                 const groups = [...venue.pricingItems]
@@ -253,8 +258,8 @@ export default function VenueDetailScreen() {
                 ));
               })()}
             </ScrollView>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -414,7 +419,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.secondary,
     backgroundColor: Colors.secondaryFixed + '33',
+    flex: 0,
   },
+  pricingBtnSpacer: { flex: 1 },
   pricingBtnText: {
     ...T.bodyMd,
     fontSize: 14,
@@ -424,7 +431,7 @@ const styles = StyleSheet.create({
 });
 
 const m = StyleSheet.create({
-  backdrop: {
+  container: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
@@ -433,7 +440,7 @@ const m = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerLowest,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '85%',
+    maxHeight: WINDOW_HEIGHT * 0.85,
     paddingBottom: 32,
   },
   handle: {
