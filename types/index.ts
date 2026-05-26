@@ -22,6 +22,15 @@ export interface VenuePhotoDto {
   photoUrl: string | null;
 }
 
+export interface PricingItemDto {
+  id: string;
+  category: string | null;
+  title: string;
+  subtitle: string | null;
+  price: number;
+  displayOrder: number;
+}
+
 export interface VenueDto {
   id: string;
   name: string;
@@ -37,6 +46,7 @@ export interface VenueDto {
   longitude: number | null;
   googleMapsUrl: string | null;
   description: string | null;
+  pricingItems: PricingItemDto[];
 }
 
 export interface PendingRatingDto {

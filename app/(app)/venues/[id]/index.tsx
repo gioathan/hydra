@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Pressable,
   Linking,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -28,6 +29,7 @@ export default function VenueDetailScreen() {
   const [partySize, setPartySize] = useState(2);
   const [checkingSlots, setCheckingSlots] = useState(false);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   const { data: venue, isLoading: venueLoading } = useQuery({
     queryKey: ['venue', id],
@@ -134,6 +136,17 @@ export default function VenueDetailScreen() {
             </>
           )}
 
+          {venue.pricingItems.length > 0 && (
+            <>
+              <View style={styles.divider} />
+              <Pressable style={styles.pricingBtn} onPress={() => setPricingOpen(true)}>
+                <MaterialIcons name="receipt-long" size={18} color={Colors.secondary} />
+                <Text style={styles.pricingBtnText}>Menu &amp; Pricing</Text>
+                <MaterialIcons name="chevron-right" size={18} color={Colors.secondary} style={{ marginLeft: 'auto' }} />
+              </Pressable>
+            </>
+          )}
+
           <View style={styles.divider} />
 
           {/* Date picker */}
@@ -186,6 +199,63 @@ export default function VenueDetailScreen() {
           />
         </View>
       </ScrollView>
+
+      {/* Pricing modal */}
+      <Modal
+        visible={pricingOpen}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setPricingOpen(false)}
+      >
+        <Pressable style={m.backdrop} onPress={() => setPricingOpen(false)}>
+          <Pressable style={m.sheet} onPress={() => {}}>
+            {/* Handle */}
+            <View style={m.handle} />
+
+            {/* Header */}
+            <View style={m.header}>
+              <Text style={m.headerTitle}>Menu &amp; Pricing</Text>
+              <Pressable onPress={() => setPricingOpen(false)} hitSlop={12}>
+                <MaterialIcons name="close" size={22} color={Colors.onSurfaceVariant} />
+              </Pressable>
+            </View>
+
+            {/* Scrollable content */}
+            <ScrollView style={m.scroll} contentContainerStyle={m.scrollContent} showsVerticalScrollIndicator={false}>
+              {(() => {
+                const groups = [...venue.pricingItems]
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .reduce((map, item) => {
+                    const key = item.category ?? '';
+                    if (!map.has(key)) map.set(key, [] as typeof venue.pricingItems);
+                    map.get(key)!.push(item);
+                    return map;
+                  }, new Map<string, typeof venue.pricingItems>());
+
+                return Array.from(groups.entries()).map(([category, items]) => (
+                  <View key={category || '__none__'} style={m.group}>
+                    {category ? (
+                      <View style={m.categoryRow}>
+                        <Text style={m.categoryLabel}>{category.toUpperCase()}</Text>
+                        <View style={m.categoryLine} />
+                      </View>
+                    ) : null}
+                    {items.map((item, idx) => (
+                      <View key={item.id} style={[m.itemRow, idx < items.length - 1 && m.itemBorder]}>
+                        <View style={m.itemLeft}>
+                          <Text style={m.itemTitle}>{item.title}</Text>
+                          {item.subtitle ? <Text style={m.itemSubtitle}>{item.subtitle}</Text> : null}
+                        </View>
+                        <Text style={m.itemPrice}>€{item.price.toFixed(2)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ));
+              })()}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -333,5 +403,108 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurfaceVariant,
     lineHeight: 22,
+  },
+  pricingBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.secondary,
+    backgroundColor: Colors.secondaryFixed + '33',
+  },
+  pricingBtnText: {
+    ...T.bodyMd,
+    fontSize: 14,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: Colors.secondary,
+  },
+});
+
+const m = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
+    paddingBottom: 32,
+  },
+  handle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.outlineVariant,
+    alignSelf: 'center',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
+  },
+  headerTitle: {
+    ...T.headlineMd,
+    fontSize: 16,
+    color: Colors.primary,
+  },
+  scroll: { flex: 1 },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
+  group: { marginTop: 16 },
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  categoryLabel: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.secondary,
+  },
+  categoryLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.secondaryFixed,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingVertical: 12,
+  },
+  itemBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant + '66',
+  },
+  itemLeft: { flex: 1, gap: 2 },
+  itemTitle: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurface,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+  },
+  itemSubtitle: {
+    ...T.bodyMd,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+  },
+  itemPrice: {
+    ...T.bodyMd,
+    fontSize: 14,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: Colors.secondary,
   },
 });
