@@ -24,12 +24,8 @@ import { registerForPushNotifications } from '../../lib/notifications';
 import { getAxiosErrorMessage } from '../../lib/utils';
 
 function GoogleIcon() {
-  return (
-    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
-      {/* Simple G icon using text since SVG isn't natively available */}
-      <Text style={{ fontSize: 14, fontWeight: '700', color: '#4285F4', lineHeight: 20 }}>G</Text>
-    </View>
-  );
+  const { FontAwesome5 } = require('@expo/vector-icons');
+  return <FontAwesome5 name="google" size={18} color="#4285F4" />;
 }
 
 export default function LoginScreen() {
