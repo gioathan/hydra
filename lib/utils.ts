@@ -38,7 +38,8 @@ export function validatePassword(password: string): string | null {
 
 export function getAxiosErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
   if (error && typeof error === 'object' && 'response' in error) {
-    const res = (error as { response?: { data?: { message?: string } } }).response;
+    const res = (error as { response?: { status?: number; data?: { message?: string } } }).response;
+    if (res?.status === 429) return 'Too many attempts. Please wait a moment and try again.';
     if (res?.data?.message) return res.data.message;
   }
   if (error instanceof Error) return error.message;

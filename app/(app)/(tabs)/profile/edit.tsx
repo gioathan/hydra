@@ -19,17 +19,11 @@ import { getCustomer, updateCustomer } from '../../../../lib/api/customers';
 import { useAuthStore } from '../../../../lib/store/authStore';
 import { getAxiosErrorMessage } from '../../../../lib/utils';
 
-const LOCALES = [
-  { value: 'en', label: 'English' },
-  { value: 'el', label: 'Ελληνικά (Greek)' },
-];
-
 export default function EditProfileScreen() {
   const { customerId } = useAuthStore();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [locale, setLocale] = useState('en');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +37,6 @@ export default function EditProfileScreen() {
     if (customer) {
       setName(customer.name ?? '');
       setPhone(customer.phone ?? '');
-      setLocale(customer.locale ?? 'en');
     }
   }, [customer]);
 
@@ -52,7 +45,6 @@ export default function EditProfileScreen() {
       updateCustomer(customerId!, {
         name: name.trim() || null,
         phone: phone.trim() || null,
-        locale,
         email: customer?.email ?? null,
       }),
     onSuccess: () => {
@@ -97,32 +89,6 @@ export default function EditProfileScreen() {
             keyboardType="phone-pad"
             placeholder="+30 210 000 0000"
           />
-
-          {/* Locale picker */}
-          <View style={styles.localeSection}>
-            <Text style={styles.localeLabel}>Language</Text>
-            <View style={styles.localeOptions}>
-              {LOCALES.map((l) => (
-                <Pressable
-                  key={l.value}
-                  style={[
-                    styles.localeOption,
-                    locale === l.value && styles.localeOptionSelected,
-                  ]}
-                  onPress={() => setLocale(l.value)}
-                >
-                  <Text
-                    style={[
-                      styles.localeOptionText,
-                      locale === l.value && styles.localeOptionTextSelected,
-                    ]}
-                  >
-                    {l.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
 
           {success && (
             <View style={styles.successBox}>
@@ -187,41 +153,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
-  },
-  localeSection: {
-    marginBottom: 20,
-  },
-  localeLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 10,
-    letterSpacing: 0.3,
-  },
-  localeOptions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  localeOption: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.card,
-    alignItems: 'center',
-  },
-  localeOptionSelected: {
-    borderColor: Colors.navy,
-    backgroundColor: Colors.navy,
-  },
-  localeOptionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-  },
-  localeOptionTextSelected: {
-    color: Colors.textInverse,
   },
   successBox: {
     backgroundColor: Colors.successBg,

@@ -202,9 +202,15 @@ export default function LoginScreen() {
             </View>
 
             {error && (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
+              error.includes('Google Sign-In') ? (
+                <View style={styles.googleHintBox}>
+                  <Text style={styles.googleHintText}>↑ This account was registered with Google. Use the "Continue with Google" button above.</Text>
+                </View>
+              ) : (
+                <View style={styles.errorBox}>
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )
             )}
 
             <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
@@ -399,6 +405,21 @@ const styles = StyleSheet.create({
     ...T.buttonText,
     color: Colors.onPrimary,
     letterSpacing: 1,
+  },
+  googleHintBox: {
+    width: '100%',
+    backgroundColor: '#fff7f4',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: Colors.secondary + '33',
+  },
+  googleHintText: {
+    ...T.labelCaps,
+    color: Colors.secondary,
+    letterSpacing: 0,
+    textTransform: 'none',
   },
   disabled: { opacity: 0.65 },
   trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
