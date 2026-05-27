@@ -1,5 +1,5 @@
-import { LegalScreen } from '../../../components/LegalScreen';
-import { privacyPolicySections } from '../../../lib/legalContent';
+import { LegalScreen } from '../../../../components/LegalScreen';
+import { privacyPolicySections } from '../../../../lib/legalContent';
 
 export default function PrivacyPolicyScreen() {
   return (

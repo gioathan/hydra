@@ -4,12 +4,12 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   Linking,
   Modal,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 import { useLocalSearchParams, router } from 'expo-router';
@@ -139,7 +139,7 @@ export default function VenueDetailScreen() {
             </>
           )}
 
-          {venue.pricingItems.length > 0 && (
+          {(venue.pricingItems ?? []).length > 0 && (
             <>
               <View style={styles.divider} />
               <Pressable style={styles.pricingBtn} onPress={() => setPricingOpen(true)}>
@@ -228,7 +228,7 @@ export default function VenueDetailScreen() {
 
             <ScrollView style={m.scroll} contentContainerStyle={m.scrollContent} showsVerticalScrollIndicator={false}>
               {(() => {
-                const groups = [...venue.pricingItems]
+                const groups = [...(venue.pricingItems ?? [])]
                   .sort((a, b) => a.displayOrder - b.displayOrder)
                   .reduce((map, item) => {
                     const key = item.category ?? '';
@@ -440,7 +440,7 @@ const m = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerLowest,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: WINDOW_HEIGHT * 0.85,
+    height: WINDOW_HEIGHT * 0.75,
     paddingBottom: 32,
   },
   handle: {

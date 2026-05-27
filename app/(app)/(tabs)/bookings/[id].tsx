@@ -12,14 +12,14 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '../../../constants/colors';
-import { T } from '../../../constants/typography';
-import { StatusBadge } from '../../../components/StatusBadge';
-import { LoadingSpinner } from '../../../components/LoadingSpinner';
-import { PrimaryButton } from '../../../components/PrimaryButton';
-import { getBooking, cancelBooking } from '../../../lib/api/bookings';
-import { getVenue } from '../../../lib/api/venues';
-import { formatLocalDate, formatLocalTime, shortId, getAxiosErrorMessage } from '../../../lib/utils';
+import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
+import { StatusBadge } from '../../../../components/StatusBadge';
+import { LoadingSpinner } from '../../../../components/LoadingSpinner';
+import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { getBooking, cancelBooking } from '../../../../lib/api/bookings';
+import { getVenue } from '../../../../lib/api/venues';
+import { formatLocalDate, formatLocalTime, shortId, getAxiosErrorMessage } from '../../../../lib/utils';
 
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

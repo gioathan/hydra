@@ -4,6 +4,19 @@ import { VenuePlaceholder } from './VenuePlaceholder';
 import { Colors } from '../constants/colors';
 import type { VenuePhotoDto } from '../types';
 
+function SingleImage({ uri, height, name, width }: { uri: string; height: number; name: string; width?: number | string }) {
+  const [error, setError] = useState(false);
+  if (error) return <VenuePlaceholder name={name} height={height} />;
+  return (
+    <Image
+      source={{ uri }}
+      style={{ width: width ?? '100%', height }}
+      resizeMode="cover"
+      onError={() => setError(true)}
+    />
+  );
+}
+
 interface PhotoSliderProps {
   photos: VenuePhotoDto[];
   name: string;
@@ -22,11 +35,7 @@ export function PhotoSlider({ photos, name, height }: PhotoSliderProps) {
 
   if (resolved.length === 1) {
     return (
-      <Image
-        source={{ uri: resolved[0].photoUrl! }}
-        style={{ width: '100%', height }}
-        resizeMode="cover"
-      />
+      <SingleImage uri={resolved[0].photoUrl!} height={height} name={name} />
     );
   }
 
@@ -43,12 +52,7 @@ export function PhotoSlider({ photos, name, height }: PhotoSliderProps) {
         style={{ width, height }}
       >
         {resolved.map((photo) => (
-          <Image
-            key={photo.id}
-            source={{ uri: photo.photoUrl! }}
-            style={{ width, height }}
-            resizeMode="cover"
-          />
+          <SingleImage key={photo.id} uri={photo.photoUrl!} height={height} name={name} width={width} />
         ))}
       </ScrollView>
 

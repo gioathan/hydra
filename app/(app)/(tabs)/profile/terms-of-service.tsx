@@ -1,5 +1,5 @@
-import { LegalScreen } from '../../../components/LegalScreen';
-import { termsOfServiceSections } from '../../../lib/legalContent';
+import { LegalScreen } from '../../../../components/LegalScreen';
+import { termsOfServiceSections } from '../../../../lib/legalContent';
 
 export default function TermsOfServiceScreen() {
   return (

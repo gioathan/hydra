@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';
-import { Colors } from '../../../constants/colors';
-import { InputField } from '../../../components/InputField';
-import { PrimaryButton } from '../../../components/PrimaryButton';
-import { updatePassword } from '../../../lib/api/users';
-import { useAuthStore } from '../../../lib/store/authStore';
-import { validatePassword, getAxiosErrorMessage } from '../../../lib/utils';
+import { Colors } from '../../../../constants/colors';
+import { InputField } from '../../../../components/InputField';
+import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { updatePassword } from '../../../../lib/api/users';
+import { useAuthStore } from '../../../../lib/store/authStore';
+import { validatePassword, getAxiosErrorMessage } from '../../../../lib/utils';
 
 export default function ChangePasswordScreen() {
   const { user } = useAuthStore();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
@@ -18,6 +18,7 @@ export function VenueCard({ venue, venueType, onPress, onBook }: VenueCardProps)
   const photoUrl = [...venue.photos]
     .sort((a, b) => a.displayOrder - b.displayOrder)
     .find((p) => p.photoUrl != null)?.photoUrl ?? null;
+  const [imgError, setImgError] = useState(false);
 
   return (
     <Pressable
@@ -26,8 +27,8 @@ export function VenueCard({ venue, venueType, onPress, onBook }: VenueCardProps)
     >
       {/* Image */}
       <View style={styles.imageContainer}>
-        {photoUrl ? (
-          <Image source={{ uri: photoUrl }} style={styles.image} resizeMode="cover" />
+        {photoUrl && !imgError ? (
+          <Image source={{ uri: photoUrl }} style={styles.image} resizeMode="cover" onError={() => setImgError(true)} />
         ) : (
           <VenuePlaceholder name={venue.name} height={256} />
         )}

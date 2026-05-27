@@ -11,16 +11,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '../../../constants/colors';
-import { T } from '../../../constants/typography';
-import { BookingCard } from '../../../components/BookingCard';
-import { LoadingSpinner } from '../../../components/LoadingSpinner';
-import { PrimaryButton } from '../../../components/PrimaryButton';
-import { getBookings } from '../../../lib/api/bookings';
-import { getVenue } from '../../../lib/api/venues';
-import { useAuthStore } from '../../../lib/store/authStore';
+import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
+import { BookingCard } from '../../../../components/BookingCard';
+import { LoadingSpinner } from '../../../../components/LoadingSpinner';
+import { PrimaryButton } from '../../../../components/PrimaryButton';
+import { getBookings } from '../../../../lib/api/bookings';
+import { getVenue } from '../../../../lib/api/venues';
+import { useAuthStore } from '../../../../lib/store/authStore';
 import { parseISO, isBefore } from 'date-fns';
-import type { BookingDto } from '../../../types';
+import type { BookingDto } from '../../../../types';
 
 type Tab = 'upcoming' | 'past';
 

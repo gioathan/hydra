@@ -12,14 +12,14 @@ import {
 import { router } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '../../../constants/colors';
-import { T } from '../../../constants/typography';
-import { Avatar } from '../../../components/Avatar';
-import { LoadingSpinner } from '../../../components/LoadingSpinner';
-import { getCustomer } from '../../../lib/api/customers';
-import { useAuthStore } from '../../../lib/store/authStore';
-import { clearAll } from '../../../lib/secureStore';
-import { unregisterPushNotifications } from '../../../lib/notifications';
+import { Colors } from '../../../../constants/colors';
+import { T } from '../../../../constants/typography';
+import { Avatar } from '../../../../components/Avatar';
+import { LoadingSpinner } from '../../../../components/LoadingSpinner';
+import { getCustomer } from '../../../../lib/api/customers';
+import { useAuthStore } from '../../../../lib/store/authStore';
+import { clearAll } from '../../../../lib/secureStore';
+import { unregisterPushNotifications } from '../../../../lib/notifications';
 
 type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 

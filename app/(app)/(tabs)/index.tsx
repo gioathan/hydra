@@ -15,18 +15,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '../../constants/colors';
-import { T } from '../../constants/typography';
-import { VenueCard } from '../../components/VenueCard';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { Avatar } from '../../components/Avatar';
-import { getVenues, getVenueLocations } from '../../lib/api/venues';
-import { getVenueTypes } from '../../lib/api/venueTypes';
-import { getCustomer } from '../../lib/api/customers';
-import { getPendingRatings } from '../../lib/api/ratings';
-import { useAuthStore } from '../../lib/store/authStore';
-import { getLocation, saveLocation } from '../../lib/secureStore';
-import type { VenueDto, VenueTypeDto, PendingRatingDto } from '../../types';
+import { Colors } from '../../../constants/colors';
+import { T } from '../../../constants/typography';
+import { VenueCard } from '../../../components/VenueCard';
+import { LoadingSpinner } from '../../../components/LoadingSpinner';
+import { Avatar } from '../../../components/Avatar';
+import { getVenues, getVenueLocations } from '../../../lib/api/venues';
+import { getVenueTypes } from '../../../lib/api/venueTypes';
+import { getCustomer } from '../../../lib/api/customers';
+import { getPendingRatings } from '../../../lib/api/ratings';
+import { useAuthStore } from '../../../lib/store/authStore';
+import { getLocation, saveLocation } from '../../../lib/secureStore';
+import type { VenueDto, VenueTypeDto, PendingRatingDto } from '../../../types';
 
 const PAGE_SIZE = 25;
 
@@ -188,8 +188,8 @@ export default function HomeScreen() {
       <VenueCard
         venue={item}
         venueType={typeMap.get(item.venueTypeId)}
-        onPress={() => router.push(`/(app)/venues/${item.id}`)}
-        onBook={() => router.push(`/(app)/venues/${item.id}`)}
+        onPress={() => router.push({ pathname: '/(app)/venues/[id]', params: { id: item.id } })}
+        onBook={() => router.push({ pathname: '/(app)/venues/[id]', params: { id: item.id } })}
       />
     ),
     [typeMap]
