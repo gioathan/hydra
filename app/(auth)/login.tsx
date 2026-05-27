@@ -6,13 +6,23 @@ import {
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
-import { login } from '../../lib/api/auth';
+import { login, googleLogin } from '../../lib/api/auth';
 import { useAuthStore } from '../../lib/store/authStore';
 import { saveToken, saveUser, saveCustomerId, getPendingUserId } from '../../lib/secureStore';
 import { registerForPushNotifications } from '../../lib/notifications';
 import { getAxiosErrorMessage } from '../../lib/utils';
+
+function GoogleIcon() {
+  return (
+    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Simple G icon using text since SVG isn't natively available */}
+      <Text style={{ fontSize: 14, fontWeight: '700', color: '#4285F4', lineHeight: 20 }}>G</Text>
+    </View>
+  );
+}
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,20 +32,22 @@ export default function LoginScreen() {
   const [_trap, setTrap] = useState('');
   const { setAuth } = useAuthStore();
 
+  const handleAuthSuccess = async (data: { token: string; user: any; customerId: string | null }) => {
+    if (!data.customerId) {
+      setError('No customer account associated with this user.');
+      return;
+    }
+    await saveToken(data.token);
+    await saveUser(data.user);
+    await saveCustomerId(data.customerId);
+    setAuth(data.token, data.user, data.customerId);
+    await registerForPushNotifications(data.customerId);
+    router.replace('/(app)');
+  };
+
   const mutation = useMutation({
     mutationFn: () => login({ email: email.trim(), password }),
-    onSuccess: async (data) => {
-      if (!data.customerId) {
-        setError('No customer account associated with this user.');
-        return;
-      }
-      await saveToken(data.token);
-      await saveUser(data.user);
-      await saveCustomerId(data.customerId);
-      setAuth(data.token, data.user, data.customerId);
-      await registerForPushNotifications(data.customerId);
-      router.replace('/(app)');
-    },
+    onSuccess: handleAuthSuccess,
     onError: async (err: any) => {
       if (err?.response?.status === 403) {
         const userId = err?.response?.data?.userId ?? await getPendingUserId() ?? '';
@@ -49,6 +61,26 @@ export default function LoginScreen() {
     },
   });
 
+  const googleMutation = useMutation({
+    mutationFn: async () => {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
+      if (!idToken) throw new Error('Could not retrieve Google ID token.');
+      return googleLogin({ idToken });
+    },
+    onSuccess: handleAuthSuccess,
+    onError: (err: any) => {
+      if (err?.code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (err?.code === statusCodes.IN_PROGRESS) return;
+      if (err?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setError('Google Play Services are not available on this device.');
+        return;
+      }
+      setError(getAxiosErrorMessage(err, 'Google sign-in failed. Please try again.'));
+    },
+  });
+
   const handleLogin = () => {
     if (_trap) return;
     setError(null);
@@ -58,6 +90,8 @@ export default function LoginScreen() {
     }
     mutation.mutate();
   };
+
+  const anyPending = mutation.isPending || googleMutation.isPending;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -84,6 +118,29 @@ export default function LoginScreen() {
 
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>Sign in to your account.</Text>
+
+            {/* Google sign-in button */}
+            <Pressable
+              style={({ pressed }) => [styles.googleBtn, pressed && styles.pressed, anyPending && styles.disabled]}
+              onPress={() => { setError(null); googleMutation.mutate(); }}
+              disabled={anyPending}
+            >
+              {googleMutation.isPending ? (
+                <ActivityIndicator size="small" color={Colors.onSurfaceVariant} />
+              ) : (
+                <>
+                  <GoogleIcon />
+                  <Text style={styles.googleLabel}>Continue with Google</Text>
+                </>
+              )}
+            </Pressable>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
             {/* Email */}
             <View style={styles.fieldGroup}>
@@ -139,9 +196,9 @@ export default function LoginScreen() {
             <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
 
             <Pressable
-              style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed, anyPending && styles.disabled]}
               onPress={handleLogin}
-              disabled={mutation.isPending}
+              disabled={anyPending}
             >
               {mutation.isPending
                 ? <ActivityIndicator size="small" color={Colors.onPrimary} />
@@ -223,7 +280,43 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 24,
+  },
+  googleBtn: {
+    width: '100%',
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 1.5,
+    borderColor: Colors.outlineVariant,
+    borderRadius: 10,
+    backgroundColor: Colors.surfaceContainerLowest,
+    marginBottom: 20,
+  },
+  googleLabel: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurface,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+  },
+  divider: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.outlineVariant,
+  },
+  dividerText: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
   },
   fieldGroup: {
     width: '100%',
@@ -293,6 +386,7 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
     letterSpacing: 1,
   },
+  disabled: { opacity: 0.65 },
   trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
   pressed: {
     opacity: 0.82,

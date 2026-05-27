@@ -10,10 +10,17 @@ import {
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useAuthStore } from '../lib/store/authStore';
 import { getToken, getUser, getCustomerId } from '../lib/secureStore';
 import type { UserDto } from '../types';
 import { setupNotificationResponseListener } from '../lib/notifications';
+
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+  offlineAccess: false,
+});
 
 SplashScreen.preventAutoHideAsync();
 

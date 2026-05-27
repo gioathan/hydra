@@ -6,10 +6,13 @@ import {
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
-import { registerCustomer } from '../../lib/api/auth';
-import { saveUser, savePendingUserId } from '../../lib/secureStore';
+import { registerCustomer, googleLogin } from '../../lib/api/auth';
+import { useAuthStore } from '../../lib/store/authStore';
+import { saveToken, saveUser, saveCustomerId, savePendingUserId } from '../../lib/secureStore';
+import { registerForPushNotifications } from '../../lib/notifications';
 import { validatePassword, getAxiosErrorMessage } from '../../lib/utils';
 
 interface FieldErrors {
@@ -84,6 +87,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [_trap, setTrap] = useState('');
+  const { setAuth } = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -98,6 +102,37 @@ export default function RegisterScreen() {
     },
     onError: (err) => {
       setErrors({ general: getAxiosErrorMessage(err, 'Registration failed. Please try again.') });
+    },
+  });
+
+  const googleMutation = useMutation({
+    mutationFn: async () => {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
+      if (!idToken) throw new Error('Could not retrieve Google ID token.');
+      return googleLogin({ idToken });
+    },
+    onSuccess: async (data) => {
+      if (!data.customerId) {
+        setErrors({ general: 'This Google account could not be linked to a customer account.' });
+        return;
+      }
+      await saveToken(data.token);
+      await saveUser(data.user);
+      await saveCustomerId(data.customerId);
+      setAuth(data.token, data.user, data.customerId);
+      await registerForPushNotifications(data.customerId);
+      router.replace('/(app)');
+    },
+    onError: (err: any) => {
+      if (err?.code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (err?.code === statusCodes.IN_PROGRESS) return;
+      if (err?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        setErrors({ general: 'Google Play Services are not available on this device.' });
+        return;
+      }
+      setErrors({ general: getAxiosErrorMessage(err, 'Google sign-up failed. Please try again.') });
     },
   });
 
@@ -117,6 +152,8 @@ export default function RegisterScreen() {
     setErrors({});
     if (validate()) mutation.mutate();
   };
+
+  const anyPending = mutation.isPending || googleMutation.isPending;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -144,6 +181,31 @@ export default function RegisterScreen() {
             <Text style={styles.title}>Join Us</Text>
             <Text style={styles.subtitle}>Create an account and start booking restaurants, bars and activities.</Text>
 
+            {/* Google sign-up button */}
+            <Pressable
+              style={({ pressed }) => [styles.googleBtn, pressed && styles.pressed, anyPending && styles.disabled]}
+              onPress={() => { setErrors({}); googleMutation.mutate(); }}
+              disabled={anyPending}
+            >
+              {googleMutation.isPending ? (
+                <ActivityIndicator size="small" color={Colors.onSurfaceVariant} />
+              ) : (
+                <>
+                  <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#4285F4', lineHeight: 20 }}>G</Text>
+                  </View>
+                  <Text style={styles.googleLabel}>Sign up with Google</Text>
+                </>
+              )}
+            </Pressable>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
             <Field label="FULL NAME" value={name} onChangeText={setName}
               placeholder="Alex Johnson" autoCapitalize="words" error={errors.name} />
             <Field label="EMAIL" value={email} onChangeText={setEmail}
@@ -163,9 +225,9 @@ export default function RegisterScreen() {
             <TextInput style={styles.trap} value={_trap} onChangeText={setTrap} autoComplete="off" importantForAutofill="no" />
 
             <Pressable
-              style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.submitBtn, pressed && styles.pressed, anyPending && styles.disabled]}
               onPress={handleRegister}
-              disabled={mutation.isPending}
+              disabled={anyPending}
             >
               {mutation.isPending
                 ? <ActivityIndicator size="small" color={Colors.onPrimary} />
@@ -246,8 +308,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 24,
     lineHeight: 22,
+  },
+  googleBtn: {
+    width: '100%',
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 1.5,
+    borderColor: Colors.outlineVariant,
+    borderRadius: 10,
+    backgroundColor: Colors.surfaceContainerLowest,
+    marginBottom: 20,
+  },
+  googleLabel: {
+    ...T.bodyMd,
+    fontSize: 14,
+    color: Colors.onSurface,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+  },
+  divider: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.outlineVariant,
+  },
+  dividerText: {
+    ...T.labelCaps,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
   },
   errorBox: {
     width: '100%',
@@ -281,6 +379,7 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
     letterSpacing: 1,
   },
+  disabled: { opacity: 0.65 },
   trap: { position: 'absolute', left: -9999, top: -9999, height: 0, opacity: 0 },
   pressed: {
     opacity: 0.82,

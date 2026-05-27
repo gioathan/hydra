@@ -2,6 +2,7 @@ import { apiClient } from '../api';
 import type {
   LoginRequest, LoginResponse, RegisterRequest, RegisterResponse,
   VerifyEmailRequest, ResendVerificationRequest, ForgotPasswordRequest, ResetPasswordRequest,
+  GoogleLoginRequest,
 } from '../../types';
 
 export async function login(body: LoginRequest): Promise<LoginResponse> {
@@ -28,4 +29,9 @@ export async function forgotPassword(body: ForgotPasswordRequest): Promise<void>
 
 export async function resetPassword(body: ResetPasswordRequest): Promise<void> {
   await apiClient.post('/auth/reset-password', body);
+}
+
+export async function googleLogin(body: GoogleLoginRequest): Promise<LoginResponse> {
+  const { data } = await apiClient.post<LoginResponse>('/auth/google', body);
+  return data;
 }

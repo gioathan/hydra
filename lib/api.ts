@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     console.log(`[API] ERROR ${error.config?.url} — ${error.message}`);
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/google')) {
       useAuthStore.getState().clearAuth();
       await clearAll();
       router.replace('/(auth)');
