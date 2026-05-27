@@ -6,7 +6,15 @@ import {
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+let GoogleSignin: any = null;
+let statusCodes: any = {};
+try {
+  const mod = require('@react-native-google-signin/google-signin');
+  GoogleSignin = mod.GoogleSignin;
+  statusCodes = mod.statusCodes;
+} catch {
+  // Native module unavailable in Expo Go
+}
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
 import { registerCustomer, googleLogin } from '../../lib/api/auth';
@@ -107,8 +115,14 @@ export default function RegisterScreen() {
 
   const googleMutation = useMutation({
     mutationFn: async () => {
+      if (!GoogleSignin) throw new Error('Google Sign-In is not available in Expo Go. Use a development build.');
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
+      if (response.type === 'cancelled') {
+        const err: any = new Error('cancelled');
+        err.code = statusCodes.SIGN_IN_CANCELLED;
+        throw err;
+      }
       const idToken = response.data?.idToken;
       if (!idToken) throw new Error('Could not retrieve Google ID token.');
       return googleLogin({ idToken });
@@ -185,7 +199,7 @@ export default function RegisterScreen() {
             <Pressable
               style={({ pressed }) => [styles.googleBtn, pressed && styles.pressed, anyPending && styles.disabled]}
               onPress={() => { setErrors({}); googleMutation.mutate(); }}
-              disabled={anyPending}
+              disabled={anyPending || !GoogleSignin}
             >
               {googleMutation.isPending ? (
                 <ActivityIndicator size="small" color={Colors.onSurfaceVariant} />

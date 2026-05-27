@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#1B2B4B"
       },
-      "package": "com.hydra.booking"
+      "package": "com.hydra.booking",
+      "jsEngine": "hermes"
     },
     "web": {
       "bundler": "metro",

@@ -21,6 +21,9 @@ import { useAuthStore } from '../../../../lib/store/authStore';
 import { clearAll } from '../../../../lib/secureStore';
 import { unregisterPushNotifications } from '../../../../lib/notifications';
 
+let GoogleSignin: any = null;
+try { GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin; } catch {}
+
 type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 interface MenuRowProps {
@@ -71,6 +74,7 @@ export default function ProfileScreen() {
         style: 'destructive',
         onPress: async () => {
           if (customerId) await unregisterPushNotifications(customerId);
+          try { if (GoogleSignin) await GoogleSignin.signOut(); } catch {}
           clearAuth();
           await clearAll();
           queryClient.clear();
