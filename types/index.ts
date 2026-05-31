@@ -17,9 +17,8 @@ export interface CustomerDto {
 
 export interface VenuePhotoDto {
   id: string;
-  googlePlaceId: string | null;
+  url: string;
   displayOrder: number;
-  photoUrl: string | null;
 }
 
 export interface PricingItemDto {
