@@ -27,7 +27,7 @@ export function PhotoSlider({ photos, name, height }: PhotoSliderProps) {
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const resolved = photos.filter((p) => p.photoUrl != null);
+  const resolved = photos.filter((p) => p.url != null);
 
   if (resolved.length === 0) {
     return <VenuePlaceholder name={name} height={height} />;
@@ -35,7 +35,7 @@ export function PhotoSlider({ photos, name, height }: PhotoSliderProps) {
 
   if (resolved.length === 1) {
     return (
-      <SingleImage uri={resolved[0].photoUrl!} height={height} name={name} />
+      <SingleImage uri={resolved[0].url} height={height} name={name} />
     );
   }
 
@@ -52,7 +52,7 @@ export function PhotoSlider({ photos, name, height }: PhotoSliderProps) {
         style={{ width, height }}
       >
         {resolved.map((photo) => (
-          <SingleImage key={photo.id} uri={photo.photoUrl!} height={height} name={name} width={width} />
+          <SingleImage key={photo.id} uri={photo.url} height={height} name={name} width={width} />
         ))}
       </ScrollView>
 
