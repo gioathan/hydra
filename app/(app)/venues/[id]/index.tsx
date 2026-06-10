@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.outline,
+    borderColor: Colors.outlineVariant,
     marginTop: 4,
   },
   noBookingsText: {
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.outline,
+    borderColor: Colors.outlineVariant,
     overflow: 'hidden',
     marginBottom: 10,
   },
