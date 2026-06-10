@@ -26,6 +26,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="events"
+        options={{
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Events" icon="local-fire-department" />,
+        }}
+      />
+      <Tabs.Screen
         name="bookings"
         options={{
           tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Bookings" icon="event-note" />,
