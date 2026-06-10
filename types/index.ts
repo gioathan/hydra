@@ -47,6 +47,26 @@ export interface VenueDto {
   description: string | null;
   pricingItems: PricingItemDto[];
   bookingsEnabled: boolean;
+  eventsEnabled: boolean;
+}
+
+export interface VenueEventPhotoDto {
+  id: string;
+  url: string;
+  displayOrder: number;
+}
+
+export interface VenueEventDto {
+  id: string;
+  venueId: string;
+  title: string;
+  description: string | null;
+  startsAtUtc: string;
+  endsAtUtc: string | null;
+  closedAtUtc: string | null;
+  mainPhotoUrl: string | null;
+  additionalPhotos: VenueEventPhotoDto[];
+  isPast: boolean;
 }
 
 export interface PendingRatingDto {
