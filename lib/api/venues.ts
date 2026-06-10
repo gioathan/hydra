@@ -1,5 +1,5 @@
 import { apiClient } from '../api';
-import type { PagedResult, VenueDto, AvailabilityResponse, RateVenueRequest, VenueEventDto } from '../../types';
+import type { PagedResult, VenueDto, AvailabilityResponse, RateVenueRequest, VenueEventDto, EventListItemDto } from '../../types';
 
 export async function getVenues(
   page = 1,
@@ -36,6 +36,21 @@ export async function rateVenue(venueId: string, body: RateVenueRequest): Promis
 
 export async function getVenueEvents(venueId: string): Promise<VenueEventDto[]> {
   const { data } = await apiClient.get<VenueEventDto[]>(`/venues/${venueId}/events`);
+  return data;
+}
+
+export async function getUpcomingEvents(
+  page = 1,
+  pageSize = 10,
+  location?: string | null
+): Promise<PagedResult<EventListItemDto>> {
+  const { data } = await apiClient.get<PagedResult<EventListItemDto>>('/events', {
+    params: {
+      page,
+      pageSize,
+      ...(location ? { location } : {}),
+    },
+  });
   return data;
 }
 

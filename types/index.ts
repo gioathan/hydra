@@ -69,6 +69,18 @@ export interface VenueEventDto {
   isPast: boolean;
 }
 
+export interface EventListItemDto {
+  id: string;
+  venueId: string;
+  venueName: string;
+  venueLocation: string | null;
+  title: string;
+  description: string | null;
+  startsAtUtc: string;
+  endsAtUtc: string | null;
+  mainPhotoUrl: string | null;
+}
+
 export interface PendingRatingDto {
   venueId: string;
   venueName: string;
