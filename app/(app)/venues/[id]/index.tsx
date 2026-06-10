@@ -153,54 +153,65 @@ export default function VenueDetailScreen() {
 
           <View style={styles.divider} />
 
-          {/* Date picker */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>SELECT A DATE</Text>
-            <CalendarPicker
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-              minDate={new Date()}
-            />
-          </View>
+          {venue.bookingsEnabled ? (
+            <>
+              {/* Date picker */}
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>SELECT A DATE</Text>
+                <CalendarPicker
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
+                  minDate={new Date()}
+                />
+              </View>
 
-          <View style={styles.divider} />
+              <View style={styles.divider} />
 
-          {/* Party size */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>PARTY SIZE</Text>
-            <View style={styles.stepperRow}>
-              <Pressable
-                style={[styles.stepBtn, partySize <= 1 && styles.stepBtnDisabled]}
-                onPress={() => setPartySize((n) => Math.max(1, n - 1))}
-                disabled={partySize <= 1}
-              >
-                <MaterialIcons name="remove" size={20} color={partySize <= 1 ? Colors.outline : Colors.onPrimary} />
-              </Pressable>
-              <Text style={styles.partyCount}>{partySize}</Text>
-              <Pressable
-                style={[styles.stepBtn, partySize >= maxParty && styles.stepBtnDisabled]}
-                onPress={() => setPartySize((n) => Math.min(maxParty, n + 1))}
-                disabled={partySize >= maxParty}
-              >
-                <MaterialIcons name="add" size={20} color={partySize >= maxParty ? Colors.outline : Colors.onPrimary} />
-              </Pressable>
-            </View>
-            <Text style={styles.partySizeHint}>Maximum {maxParty} guests</Text>
-          </View>
+              {/* Party size */}
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>PARTY SIZE</Text>
+                <View style={styles.stepperRow}>
+                  <Pressable
+                    style={[styles.stepBtn, partySize <= 1 && styles.stepBtnDisabled]}
+                    onPress={() => setPartySize((n) => Math.max(1, n - 1))}
+                    disabled={partySize <= 1}
+                  >
+                    <MaterialIcons name="remove" size={20} color={partySize <= 1 ? Colors.outline : Colors.onPrimary} />
+                  </Pressable>
+                  <Text style={styles.partyCount}>{partySize}</Text>
+                  <Pressable
+                    style={[styles.stepBtn, partySize >= maxParty && styles.stepBtnDisabled]}
+                    onPress={() => setPartySize((n) => Math.min(maxParty, n + 1))}
+                    disabled={partySize >= maxParty}
+                  >
+                    <MaterialIcons name="add" size={20} color={partySize >= maxParty ? Colors.outline : Colors.onPrimary} />
+                  </Pressable>
+                </View>
+                <Text style={styles.partySizeHint}>Maximum {maxParty} guests</Text>
+              </View>
 
-          {availabilityError && (
-            <View style={styles.errorBox}>
-              <MaterialIcons name="info-outline" size={16} color={Colors.error} style={styles.errorIcon} />
-              <Text style={styles.errorText}>{availabilityError}</Text>
+              {availabilityError && (
+                <View style={styles.errorBox}>
+                  <MaterialIcons name="info-outline" size={16} color={Colors.error} style={styles.errorIcon} />
+                  <Text style={styles.errorText}>{availabilityError}</Text>
+                </View>
+              )}
+
+              <PrimaryButton
+                title="See Available Slots"
+                onPress={handleSeeSlots}
+                loading={checkingSlots}
+                style={styles.slotsBtn}
+              />
+            </>
+          ) : (
+            <View style={styles.noBookingsBox}>
+              <MaterialIcons name="event-busy" size={24} color={Colors.onSurfaceVariant} />
+              <Text style={styles.noBookingsText}>
+                This venue is not accepting bookings at this time.
+              </Text>
             </View>
           )}
-
-          <PrimaryButton
-            title="See Available Slots"
-            onPress={handleSeeSlots}
-            loading={checkingSlots}
-            style={styles.slotsBtn}
-          />
         </View>
       </ScrollView>
 
@@ -402,6 +413,25 @@ const styles = StyleSheet.create({
   },
   slotsBtn: {
     marginTop: 24,
+  },
+  noBookingsBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.outline,
+    marginTop: 4,
+  },
+  noBookingsText: {
+    flex: 1,
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+    lineHeight: 20,
   },
   descriptionText: {
     ...T.bodyMd,
