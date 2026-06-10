@@ -22,7 +22,7 @@ import { CalendarPicker } from '../../../../components/CalendarPicker';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { LoadingSpinner } from '../../../../components/LoadingSpinner';
 import { StarRating } from '../../../../components/StarRating';
-import { getVenue, getAvailability } from '../../../../lib/api/venues';
+import { getVenue, getAvailability, getVenueEvents } from '../../../../lib/api/venues';
 import { getVenueTypes } from '../../../../lib/api/venueTypes';
 import { formatDateParam } from '../../../../lib/utils';
 
@@ -43,6 +43,13 @@ export default function VenueDetailScreen() {
   const { data: venueTypesData } = useQuery({
     queryKey: ['venueTypes'],
     queryFn: () => getVenueTypes(1, 50),
+  });
+
+  const { data: events } = useQuery({
+    queryKey: ['venueEvents', id],
+    queryFn: () => getVenueEvents(id),
+    enabled: !!id && !!venue?.eventsEnabled,
+    staleTime: 2 * 60_000,
   });
 
   const venueType = venueTypesData?.items.find((t) => t.id === venue?.venueTypeId);
@@ -148,6 +155,51 @@ export default function VenueDetailScreen() {
                 <View style={styles.pricingBtnSpacer} />
                 <MaterialIcons name="chevron-right" size={18} color={Colors.secondary} />
               </Pressable>
+            </>
+          )}
+
+          {venue.eventsEnabled && (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>EVENTS</Text>
+                {(events ?? []).length === 0 ? (
+                  <Text style={styles.noEventsText}>No upcoming events.</Text>
+                ) : (
+                  (events ?? []).map((ev) => (
+                    <View key={ev.id} style={styles.eventCard}>
+                      <View style={styles.eventContent}>
+                        <Text style={styles.eventTitle}>{ev.title}</Text>
+                        <Text style={styles.eventDate}>
+                          {new Date(ev.startsAtUtc).toLocaleDateString(undefined, {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                          })}{' '}
+                          · {new Date(ev.startsAtUtc).toLocaleTimeString(undefined, {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                          {ev.endsAtUtc
+                            ? ` – ${new Date(ev.endsAtUtc).toLocaleTimeString(undefined, {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}`
+                            : ''}
+                        </Text>
+                        {ev.description ? (
+                          <Text style={styles.eventDesc} numberOfLines={2}>{ev.description}</Text>
+                        ) : null}
+                        {venue.bookingsEnabled && (
+                          <Text style={styles.eventBookingHint}>
+                            Book a table for this date to attend this event.
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  ))
+                )}
+              </View>
             </>
           )}
 
@@ -432,6 +484,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurfaceVariant,
     lineHeight: 20,
+  },
+  noEventsText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+  },
+  eventCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.outline,
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  eventContent: {
+    padding: 14,
+    gap: 4,
+  },
+  eventTitle: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 15,
+    color: Colors.primary,
+  },
+  eventDate: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13,
+    color: Colors.secondary,
+  },
+  eventDesc: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13,
+    color: Colors.onSurfaceVariant,
+    marginTop: 2,
+  },
+  eventBookingHint: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 12,
+    color: Colors.secondary,
+    marginTop: 6,
+    fontStyle: 'italic',
   },
   descriptionText: {
     ...T.bodyMd,
