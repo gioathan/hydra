@@ -264,7 +264,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 28,
-    gap: 20,
   },
 
   // ─── Event Card ───────────────────────────────────────────────────
@@ -272,6 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: 16,
     overflow: 'hidden',
+    marginBottom: 20,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
@@ -336,9 +336,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 56,
-    backgroundColor: 'transparent',
-    // gradient via overlay — use a semi-transparent dark layer
-    backgroundImage: undefined,
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
   cardScrimContent: {
     position: 'absolute',
