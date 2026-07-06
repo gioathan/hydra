@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#fde68a',
+    borderColor: '#EFD9A8',
   },
   commentBody: {
     flex: 1,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   commentText: {
     ...T.bodyMd,
     fontSize: 14,
-    color: '#92400e',
+    color: '#9A6413',
     lineHeight: 22,
   },
   errorBox: {
