@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   googleHintBox: {
     width: '100%',
-    backgroundColor: '#fff7f4',
+    backgroundColor: '#FBF2EC',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,

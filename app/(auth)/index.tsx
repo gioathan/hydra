@@ -206,7 +206,7 @@ const sp = StyleSheet.create({
   badgeConfirmedText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#4ade80',
+    color: '#9FD3A6',
   },
   badgePending: {
     backgroundColor: 'rgba(255,255,255,0.1)',

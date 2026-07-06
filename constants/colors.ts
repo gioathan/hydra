@@ -1,92 +1,98 @@
 export const Colors = {
-  // Design system
-  primary: '#041635',
+  // Design system — Aegean (Mediterranean / island)
+  primary: '#0C5F7D',            // deep Aegean sea
   onPrimary: '#ffffff',
-  primaryContainer: '#1b2b4b',
-  onPrimaryContainer: '#8393b8',
-  inversePrimary: '#b7c6ee',
+  primaryContainer: '#0E4C63',   // deeper sea fill
+  onPrimaryContainer: '#A9D6E3', // light sea on dark fill
+  inversePrimary: '#8FD0E2',
 
-  secondary: '#9c440f',
+  secondary: '#C25B3C',          // sun-baked terracotta
   onSecondary: '#ffffff',
-  secondaryContainer: '#fd8e55',
-  onSecondaryContainer: '#6e2a00',
+  secondaryContainer: '#E88E6B', // lighter clay
+  onSecondaryContainer: '#5A2410',
 
-  tertiary: '#0c191f',
+  tertiary: '#869A5B',           // olive grove
   onTertiary: '#ffffff',
-  tertiaryContainer: '#212d34',
-  onTertiaryContainer: '#88959e',
+  tertiaryContainer: '#DCE4C6',
+  onTertiaryContainer: '#3A4622',
 
-  surface: '#fbf8fc',
-  surfaceDim: '#dbd9dc',
-  surfaceBright: '#fbf8fc',
+  // New brand accents
+  sun: '#E8A83C',                // summer gold — stars, small joyful accents
+  onSun: '#5A3D08',
+  sea: '#2A9CC0',                // Cycladic dome blue — bright highlight
+  bougainvillea: '#D45B7A',      // optional pop — featured / events
+
+  surface: '#FAF6EF',            // limewash cream
+  surfaceDim: '#E7DCCB',
+  surfaceBright: '#FEFBF5',
   surfaceContainerLowest: '#ffffff',
-  surfaceContainerLow: '#f5f3f6',
-  surfaceContainer: '#efedf0',
-  surfaceContainerHigh: '#e9e7eb',
-  surfaceContainerHighest: '#e4e2e5',
-  surfaceVariant: '#e4e2e5',
+  surfaceContainerLow: '#F4EDE1', // warm sand
+  surfaceContainer: '#EFE7DA',
+  surfaceContainerHigh: '#ECE3D4',
+  surfaceContainerHighest: '#E6DCCC',
+  surfaceVariant: '#E6DCCC',
 
-  onSurface: '#1b1b1e',
-  onSurfaceVariant: '#44474e',
-  inverseSurface: '#303033',
-  inverseOnSurface: '#f2f0f3',
+  onSurface: '#22303A',          // slate ink
+  onSurfaceVariant: '#566572',
+  inverseSurface: '#2C3A42',
+  inverseOnSurface: '#F1ECE2',
 
-  outline: '#75777f',
-  outlineVariant: '#c5c6cf',
-  surfaceTint: '#4f5e81',
+  outline: '#8B95A0',            // sea mist — muted text / outline
+  outlineVariant: '#E1D7C6',     // stone — hairlines, borders
+  surfaceTint: '#0C5F7D',
 
-  background: '#fbf8fc',
-  onBackground: '#1b1b1e',
+  background: '#FAF6EF',
+  onBackground: '#22303A',
 
-  error: '#ba1a1a',
+  error: '#C0392C',
   onError: '#ffffff',
-  errorContainer: '#ffdad6',
-  onErrorContainer: '#93000a',
+  errorContainer: '#F7DED9',
+  onErrorContainer: '#7A241B',
 
-  primaryFixed: '#d8e2ff',
-  primaryFixedDim: '#b7c6ee',
-  onPrimaryFixed: '#091b3a',
-  onPrimaryFixedVariant: '#374668',
+  primaryFixed: '#CDEAF2',
+  primaryFixedDim: '#8FD0E2',
+  onPrimaryFixed: '#04333F',
+  onPrimaryFixedVariant: '#0A4356',
 
-  secondaryFixed: '#ffdbcc',
-  secondaryFixedDim: '#ffb693',
-  onSecondaryFixed: '#351000',
-  onSecondaryFixedVariant: '#7a3000',
+  secondaryFixed: '#F6D9CD',
+  secondaryFixedDim: '#EDB49B',
+  onSecondaryFixed: '#3A1608',
+  onSecondaryFixedVariant: '#9E4527',
 
-  tertiaryFixed: '#d7e4ee',
-  tertiaryFixedDim: '#bbc8d2',
-  onTertiaryFixed: '#111d24',
-  onTertiaryFixedVariant: '#3c4850',
+  tertiaryFixed: '#DCE4C6',
+  tertiaryFixedDim: '#BFCB9E',
+  onTertiaryFixed: '#26301A',
+  onTertiaryFixedVariant: '#54613A',
 
-  // Legacy aliases (keeps unrewritten components working)
-  navy: '#041635',
-  navyLight: '#1b2b4b',
-  navyDark: '#020f26',
-  terracotta: '#9c440f',
-  terracottaLight: '#fd8e55',
-  terracottaDark: '#7a3000',
+  // Legacy aliases (keeps unrewritten components working) — remapped to Aegean
+  navy: '#0C5F7D',
+  navyLight: '#0E6E8E',
+  navyDark: '#073D50',
+  terracotta: '#C25B3C',
+  terracottaLight: '#E88E6B',
+  terracottaDark: '#9E4527',
   card: '#ffffff',
-  border: '#c5c6cf',
-  borderLight: '#e9e7eb',
-  textPrimary: '#1b1b1e',
-  textSecondary: '#44474e',
-  textMuted: '#75777f',
+  border: '#E1D7C6',
+  borderLight: '#ECE3D4',
+  textPrimary: '#22303A',
+  textSecondary: '#566572',
+  textMuted: '#8B95A0',
   textInverse: '#ffffff',
-  errorBg: '#ffdad6',
-  overlayLight: 'rgba(4, 22, 53, 0.08)',
-  overlay: 'rgba(4, 22, 53, 0.5)',
+  errorBg: '#F7DED9',
+  overlayLight: 'rgba(12, 54, 72, 0.08)',
+  overlay: 'rgba(12, 54, 72, 0.5)',
 
   // Generic semantic aliases
-  success: '#15803D',
-  successBg: '#DCFCE7',
+  success: '#4E8A5B',
+  successBg: '#E4F0E2',
 
   // Status
-  statusPending: '#B45309',
-  statusPendingBg: '#FEF3C7',
-  statusConfirmed: '#15803D',
-  statusConfirmedBg: '#DCFCE7',
-  statusCancelled: '#6B7280',
-  statusCancelledBg: '#F3F4F6',
-  statusDeclined: '#DC2626',
-  statusDeclinedBg: '#FEE2E2',
+  statusPending: '#C77E2E',
+  statusPendingBg: '#FBEED6',
+  statusConfirmed: '#4E8A5B',
+  statusConfirmedBg: '#E4F0E2',
+  statusCancelled: '#7C7669',
+  statusCancelledBg: '#EFEAE0',
+  statusDeclined: '#C6453D',
+  statusDeclinedBg: '#F7DED9',
 } as const;
