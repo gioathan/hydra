@@ -41,8 +41,6 @@ export interface VenueDto {
   averageRating: number;
   ratingCount: number;
   location: string | null;
-  latitude: number | null;
-  longitude: number | null;
   googleMapsUrl: string | null;
   description: string | null;
   pricingItems: PricingItemDto[];

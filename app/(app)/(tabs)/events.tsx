@@ -45,7 +45,7 @@ function EventCard({ event }: { event: EventListItemDto }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={() => router.push({ pathname: '/(app)/venues/[id]', params: { id: event.venueId } })}
+      onPress={() => router.push({ pathname: '/(app)/events/[id]', params: { id: event.id } })}
     >
       {/* Photo or gradient placeholder */}
       <View style={styles.cardMedia}>

@@ -54,6 +54,11 @@ export async function getUpcomingEvents(
   return data;
 }
 
+export async function getEvent(id: string): Promise<EventListItemDto> {
+  const { data } = await apiClient.get<EventListItemDto>(`/events/${id}`);
+  return data;
+}
+
 export async function getAvailability(
   venueId: string,
   date: string,
