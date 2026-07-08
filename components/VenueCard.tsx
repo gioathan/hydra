@@ -17,7 +17,7 @@ interface VenueCardProps {
 export function VenueCard({ venue, venueType, onPress, onBook }: VenueCardProps) {
   const photoUrl = [...venue.photos]
     .sort((a, b) => a.displayOrder - b.displayOrder)
-    .find((p) => p.photoUrl != null)?.photoUrl ?? null;
+    .find((p) => p.url != null)?.url ?? null;
   const [imgError, setImgError] = useState(false);
 
   return (
