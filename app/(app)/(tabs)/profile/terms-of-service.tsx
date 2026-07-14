@@ -7,7 +7,7 @@ export default function TermsOfServiceScreen() {
       title="Terms of Service"
       lastUpdated="1 January 2025"
       sections={termsOfServiceSections}
-      shareMessage="Terms of Service — HYDRA Mediterranean\nhttps://hydra.gr/terms-of-service"
+      shareMessage="Terms of Service — Local Bee Mediterranean\nhttps://hydra.gr/terms-of-service"
     />
   );
 }

@@ -48,7 +48,7 @@ function LocationPickerModal({
     <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
       <View style={modal.overlay}>
         <View style={modal.card}>
-          <Text style={modal.brand}>HYDRA</Text>
+          <Text style={modal.brand}>Local Bee</Text>
 
           <View style={modal.textBlock}>
             <Text style={modal.label}>WELCOME</Text>
@@ -214,7 +214,7 @@ export default function HomeScreen() {
           )}
         </Pressable>
 
-        <Text style={styles.brand}>HYDRA</Text>
+        <Text style={styles.brand}>Local Bee</Text>
 
         <Pressable onPress={() => router.push('/(app)/profile')} hitSlop={8}>
           <Avatar name={customer?.name} size={32} fontSize={14} />
