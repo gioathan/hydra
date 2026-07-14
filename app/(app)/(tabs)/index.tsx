@@ -10,6 +10,7 @@ import {
   Pressable,
   Modal,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -48,7 +49,10 @@ function LocationPickerModal({
     <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
       <View style={modal.overlay}>
         <View style={modal.card}>
-          <Text style={modal.brand}>Local Bee</Text>
+          <Image
+            source={require('../../../assets/images/brand-mark.png')}
+            style={modal.brand}
+          />
 
           <View style={modal.textBlock}>
             <Text style={modal.label}>WELCOME</Text>
@@ -214,7 +218,10 @@ export default function HomeScreen() {
           )}
         </Pressable>
 
-        <Text style={styles.brand}>Local Bee</Text>
+        <Image
+          source={require('../../../assets/images/brand-mark.png')}
+          style={styles.brand}
+        />
 
         <Pressable onPress={() => router.push('/(app)/profile')} hitSlop={8}>
           <Avatar name={customer?.name} size={32} fontSize={14} />
@@ -364,10 +371,9 @@ const modal = StyleSheet.create({
     gap: 20,
   },
   brand: {
-    ...T.displayLg,
-    fontSize: 22,
-    letterSpacing: 8,
-    color: Colors.primary,
+    height: 24,
+    width: 24 * (1080 / 340),
+    resizeMode: 'contain',
   },
   textBlock: {
     alignItems: 'center',
@@ -445,10 +451,9 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   },
   brand: {
-    ...T.displayLg,
-    fontSize: 22,
-    letterSpacing: 8,
-    color: Colors.primary,
+    height: 24,
+    width: 24 * (1080 / 340),
+    resizeMode: 'contain',
   },
 
   searchContainer: {
