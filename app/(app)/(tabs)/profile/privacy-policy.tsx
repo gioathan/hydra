@@ -7,7 +7,7 @@ export default function PrivacyPolicyScreen() {
       title="Privacy Policy"
       lastUpdated="1 January 2025"
       sections={privacyPolicySections}
-      shareMessage="Privacy Policy — HYDRA Mediterranean\nhttps://hydra.gr/privacy-policy"
+      shareMessage="Privacy Policy — Local Bee Mediterranean\nhttps://hydra.gr/privacy-policy"
     />
   );
 }

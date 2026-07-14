@@ -178,7 +178,7 @@ export default function RegisterScreen() {
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
           </Pressable>
-          <Text style={styles.headerBrand}>HYDRA</Text>
+          <Text style={styles.headerBrand}>Local Bee</Text>
           <View style={{ width: 24 }} />
         </View>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Pressable, Image } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { T } from '../../constants/typography';
@@ -251,7 +251,12 @@ export default function SplashScreen() {
 
         {/* Brand */}
         <View style={styles.brandRow}>
-          <Text style={styles.brand}>HYDRA</Text>
+          <Image
+            source={require('../../assets/images/brand-mark.png')}
+            style={styles.brandMark}
+            resizeMode="contain"
+          />
+          <Text style={styles.brand}>Local Bee</Text>
         </View>
 
         {/* Schedule preview */}
@@ -306,10 +311,15 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingTop: 8,
+    gap: 8,
+  },
+  brandMark: {
+    width: 72,
+    height: 72,
   },
   brand: {
     ...T.displayLg,
-    letterSpacing: 12,
+    letterSpacing: 4,
     color: Colors.primary,
   },
   copySection: {

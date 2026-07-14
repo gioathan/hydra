@@ -163,7 +163,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Text style={styles.version}>Hydra v1.0</Text>
+        <Text style={styles.version}>Local Bee v1.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
