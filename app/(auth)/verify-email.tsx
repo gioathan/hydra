@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, Pressable, ActivityIndicator,
+  View, Text, StyleSheet, SafeAreaView, Pressable, ActivityIndicator, Image,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -55,7 +55,10 @@ export default function VerifyEmailScreen() {
         <Pressable onPress={() => router.back()} hitSlop={12}>
           <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
         </Pressable>
-        <Text style={styles.headerBrand}>Local Bee</Text>
+        <Image
+          source={require('../../assets/images/brand-mark.png')}
+          style={styles.headerBrand}
+        />
         <View style={{ width: 24 }} />
       </View>
 
@@ -130,10 +133,9 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.outlineVariant,
   },
   headerBrand: {
-    ...T.displayLg,
-    fontSize: 24,
-    letterSpacing: 8,
-    color: Colors.primary,
+    height: 34,
+    width: 34 * (1080 / 340),
+    resizeMode: 'contain',
   },
   content: {
     flex: 1,

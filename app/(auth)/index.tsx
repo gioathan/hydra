@@ -256,7 +256,6 @@ export default function SplashScreen() {
             style={styles.brandMark}
             resizeMode="contain"
           />
-          <Text style={styles.brand}>Local Bee</Text>
         </View>
 
         {/* Schedule preview */}
@@ -314,13 +313,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   brandMark: {
-    width: 72,
-    height: 72,
-  },
-  brand: {
-    ...T.displayLg,
-    letterSpacing: 4,
-    color: Colors.primary,
+    height: 56,
+    width: 56 * (1080 / 340),
   },
   copySection: {
     alignItems: 'center',

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, ScrollView, StyleSheet,
-  SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator,
+  SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -178,7 +178,10 @@ export default function RegisterScreen() {
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
           </Pressable>
-          <Text style={styles.headerBrand}>Local Bee</Text>
+          <Image
+            source={require('../../assets/images/brand-mark.png')}
+            style={styles.headerBrand}
+          />
           <View style={{ width: 24 }} />
         </View>
 
@@ -276,10 +279,9 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.outlineVariant,
   },
   headerBrand: {
-    ...T.displayLg,
-    fontSize: 22,
-    letterSpacing: 8,
-    color: Colors.primary,
+    height: 34,
+    width: 34 * (1080 / 340),
+    resizeMode: 'contain',
   },
   scroll: { flex: 1 },
   scrollContent: {
