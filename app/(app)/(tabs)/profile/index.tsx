@@ -10,16 +10,18 @@ import {
   Linking,
 } from 'react-native';
 import { router } from 'expo-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../../constants/colors';
 import { T } from '../../../../constants/typography';
 import { Avatar } from '../../../../components/Avatar';
 import { LoadingSpinner } from '../../../../components/LoadingSpinner';
 import { getCustomer } from '../../../../lib/api/customers';
+import { deleteUser } from '../../../../lib/api/users';
 import { useAuthStore } from '../../../../lib/store/authStore';
 import { clearAll } from '../../../../lib/secureStore';
 import { unregisterPushNotifications } from '../../../../lib/notifications';
+import { getAxiosErrorMessage } from '../../../../lib/utils';
 
 let GoogleSignin: any = null;
 try { GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin; } catch {}
@@ -57,7 +59,7 @@ function MenuRow({ icon, label, onPress, destructive }: MenuRowProps) {
 }
 
 export default function ProfileScreen() {
-  const { customerId, clearAuth } = useAuthStore();
+  const { user, customerId, clearAuth } = useAuthStore();
   const queryClient = useQueryClient();
 
   const { data: customer, isLoading } = useQuery({
@@ -82,6 +84,35 @@ export default function ProfileScreen() {
         },
       },
     ]);
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteUser(user!.id),
+    onSuccess: async () => {
+      try { if (GoogleSignin) await GoogleSignin.signOut(); } catch {}
+      clearAuth();
+      await clearAll();
+      queryClient.clear();
+      router.replace('/(auth)');
+    },
+    onError: (err) => {
+      Alert.alert('Something went wrong', getAxiosErrorMessage(err, 'Could not delete your account. Please try again.'));
+    },
+  });
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This permanently deletes your account, bookings, and ratings. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: () => deleteMutation.mutate(),
+        },
+      ]
+    );
   };
 
   if (isLoading) return <LoadingSpinner fullScreen />;
@@ -160,6 +191,13 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <View style={styles.menuGroup}>
             <MenuRow icon="exit-to-app" label="Sign Out" onPress={handleSignOut} destructive />
+          </View>
+        </View>
+
+        {/* Delete account */}
+        <View style={styles.section}>
+          <View style={styles.menuGroup}>
+            <MenuRow icon="delete-forever" label="Delete Account" onPress={handleDeleteAccount} destructive />
           </View>
         </View>
 
