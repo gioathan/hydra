@@ -16,6 +16,7 @@ export default function AppLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="venues" />
       <Stack.Screen name="events" />
+      <Stack.Screen name="complete-profile" />
     </Stack>
   );
 }

@@ -137,7 +137,7 @@ export default function RegisterScreen() {
       await saveCustomerId(data.customerId);
       setAuth(data.token, data.user, data.customerId);
       await registerForPushNotifications(data.customerId);
-      router.replace('/(app)');
+      router.replace(data.phoneRequired ? '/(app)/complete-profile' : '/(app)');
     },
     onError: (err: any) => {
       if (err?.code === statusCodes.SIGN_IN_CANCELLED) return;
