@@ -36,7 +36,7 @@ export default function LoginScreen() {
   const [_trap, setTrap] = useState('');
   const { setAuth } = useAuthStore();
 
-  const handleAuthSuccess = async (data: { token: string; user: any; customerId: string | null }) => {
+  const handleAuthSuccess = async (data: { token: string; user: any; customerId: string | null; phoneRequired?: boolean }) => {
     if (!data.customerId) {
       setError('No customer account associated with this user.');
       return;
@@ -46,7 +46,7 @@ export default function LoginScreen() {
     await saveCustomerId(data.customerId);
     setAuth(data.token, data.user, data.customerId);
     await registerForPushNotifications(data.customerId);
-    router.replace('/(app)');
+    router.replace(data.phoneRequired ? '/(app)/complete-profile' : '/(app)');
   };
 
   const mutation = useMutation({

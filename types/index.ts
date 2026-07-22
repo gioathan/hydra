@@ -151,6 +151,7 @@ export interface LoginResponse {
   token: string;
   customerId: string | null;
   venueId: null;
+  phoneRequired: boolean;
 }
 
 export interface RegisterRequest {
