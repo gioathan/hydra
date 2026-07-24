@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, ScrollView, StyleSheet,
   SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Image,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 let GoogleSignin: any = null;
@@ -22,6 +22,7 @@ import { useAuthStore } from '../../lib/store/authStore';
 import { saveToken, saveUser, saveCustomerId, getPendingUserId } from '../../lib/secureStore';
 import { registerForPushNotifications } from '../../lib/notifications';
 import { getAxiosErrorMessage } from '../../lib/utils';
+import { decodeRedirect } from '../../lib/authRedirect';
 
 function GoogleIcon() {
   const { FontAwesome5 } = require('@expo/vector-icons');
@@ -29,6 +30,7 @@ function GoogleIcon() {
 }
 
 export default function LoginScreen() {
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +48,17 @@ export default function LoginScreen() {
     await saveCustomerId(data.customerId);
     setAuth(data.token, data.user, data.customerId);
     await registerForPushNotifications(data.customerId);
-    router.replace(data.phoneRequired ? '/(app)/complete-profile' : '/(app)');
+
+    if (data.phoneRequired) {
+      router.replace({ pathname: '/(app)/complete-profile', params: redirect ? { redirect } : {} });
+      return;
+    }
+    const target = decodeRedirect(redirect);
+    if (target) {
+      router.replace({ pathname: target.pathname as any, params: target.params as any });
+    } else {
+      router.replace('/(app)');
+    }
   };
 
   const mutation = useMutation({
@@ -57,7 +69,7 @@ export default function LoginScreen() {
         const userId = err?.response?.data?.userId ?? await getPendingUserId() ?? '';
         router.push({
           pathname: '/(auth)/verify-email',
-          params: { userId, email: email.trim() },
+          params: { userId, email: email.trim(), ...(redirect ? { redirect } : {}) },
         });
         return;
       }

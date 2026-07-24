@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, ScrollView, StyleSheet,
   SafeAreaView, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Image,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 let GoogleSignin: any = null;
@@ -22,6 +22,7 @@ import { useAuthStore } from '../../lib/store/authStore';
 import { saveToken, saveUser, saveCustomerId, savePendingUserId } from '../../lib/secureStore';
 import { registerForPushNotifications } from '../../lib/notifications';
 import { validatePassword, getAxiosErrorMessage } from '../../lib/utils';
+import { decodeRedirect } from '../../lib/authRedirect';
 
 interface FieldErrors {
   name?: string;
@@ -89,6 +90,7 @@ const field = StyleSheet.create({
 });
 
 export default function RegisterScreen() {
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -105,7 +107,7 @@ export default function RegisterScreen() {
       await savePendingUserId(data.user.id);
       router.push({
         pathname: '/(auth)/verify-email',
-        params: { userId: data.user.id, email: data.user.email },
+        params: { userId: data.user.id, email: data.user.email, ...(redirect ? { redirect } : {}) },
       });
     },
     onError: (err) => {
@@ -137,7 +139,17 @@ export default function RegisterScreen() {
       await saveCustomerId(data.customerId);
       setAuth(data.token, data.user, data.customerId);
       await registerForPushNotifications(data.customerId);
-      router.replace(data.phoneRequired ? '/(app)/complete-profile' : '/(app)');
+
+      if (data.phoneRequired) {
+        router.replace({ pathname: '/(app)/complete-profile', params: redirect ? { redirect } : {} });
+        return;
+      }
+      const target = decodeRedirect(redirect);
+      if (target) {
+        router.replace({ pathname: target.pathname as any, params: target.params as any });
+      } else {
+        router.replace('/(app)');
+      }
     },
     onError: (err: any) => {
       if (err?.code === statusCodes.SIGN_IN_CANCELLED) return;

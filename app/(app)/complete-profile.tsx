@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, ScrollView, StyleSheet,
   SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Pressable,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import { Colors } from '../../constants/colors';
@@ -11,8 +11,10 @@ import { T } from '../../constants/typography';
 import { updateCustomer } from '../../lib/api/customers';
 import { useAuthStore } from '../../lib/store/authStore';
 import { getAxiosErrorMessage } from '../../lib/utils';
+import { decodeRedirect } from '../../lib/authRedirect';
 
 export default function CompleteProfileScreen() {
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const { customerId } = useAuthStore();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,14 @@ export default function CompleteProfileScreen() {
   const mutation = useMutation({
     mutationFn: () =>
       updateCustomer(customerId!, { email: null, name: null, locale: 'en', phone: phone.trim() }),
-    onSuccess: () => router.replace('/(app)'),
+    onSuccess: () => {
+      const target = decodeRedirect(redirect);
+      if (target) {
+        router.replace({ pathname: target.pathname as any, params: target.params as any });
+      } else {
+        router.replace('/(app)');
+      }
+    },
     onError: (err) => setError(getAxiosErrorMessage(err, 'Something went wrong. Please try again.')),
   });
 

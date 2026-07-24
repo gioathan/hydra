@@ -19,8 +19,17 @@ import { createBooking } from '../../../../lib/api/bookings';
 import { getCustomer } from '../../../../lib/api/customers';
 import { useAuthStore } from '../../../../lib/store/authStore';
 import { formatLocalDate, formatLocalTime, getAxiosErrorMessage } from '../../../../lib/utils';
+import { RequireAuth } from '../../../../components/RequireAuth';
 
 export default function ConfirmScreen() {
+  return (
+    <RequireAuth>
+      <ConfirmScreenContent />
+    </RequireAuth>
+  );
+}
+
+function ConfirmScreenContent() {
   const { id, venueName, date, partySize, startUtc, endUtc } =
     useLocalSearchParams<{
       id: string;

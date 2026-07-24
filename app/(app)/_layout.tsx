@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react';
-import { Stack, router } from 'expo-router';
-import { useAuthStore } from '../../lib/store/authStore';
+import React from 'react';
+import { Stack } from 'expo-router';
 
+// Discover/venues/events are browsable without an account — only specific
+// screens (bookings, profile, booking confirm/rate) require login, guarded
+// individually via RequireAuth rather than gating this whole group.
 export default function AppLayout() {
-  const { token, isRehydrated } = useAuthStore();
-
-  useEffect(() => {
-    if (isRehydrated && !token) {
-      router.replace('/(auth)');
-    }
-  }, [token, isRehydrated]);
-
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
