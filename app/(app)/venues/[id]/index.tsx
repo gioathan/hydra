@@ -24,7 +24,7 @@ import { LoadingSpinner } from '../../../../components/LoadingSpinner';
 import { StarRating } from '../../../../components/StarRating';
 import { getVenue, getAvailability, getVenueEvents } from '../../../../lib/api/venues';
 import { getVenueTypes } from '../../../../lib/api/venueTypes';
-import { formatDateParam } from '../../../../lib/utils';
+import { formatDateParam, formatHourRange } from '../../../../lib/utils';
 import { useAuthStore } from '../../../../lib/store/authStore';
 import { encodeRedirect } from '../../../../lib/authRedirect';
 
@@ -134,6 +134,12 @@ export default function VenueDetailScreen() {
               <MaterialIcons name="people" size={16} color={Colors.onSurfaceVariant} />
               <Text style={styles.metaText}>Up to {venue.capacity} guests</Text>
             </View>
+            {formatHourRange(venue.openHour, venue.closeHour) && (
+              <View style={styles.metaRow}>
+                <MaterialIcons name="schedule" size={16} color={Colors.onSurfaceVariant} />
+                <Text style={styles.metaText}>Open {formatHourRange(venue.openHour, venue.closeHour)}</Text>
+              </View>
+            )}
             <StarRating rating={venue.averageRating} count={venue.ratingCount} size={15} />
             {venue.googleMapsUrl && (
               <Pressable
