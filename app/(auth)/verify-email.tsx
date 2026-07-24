@@ -13,7 +13,7 @@ import { OtpInput } from '../../components/OtpInput';
 import { getAxiosErrorMessage } from '../../lib/utils';
 
 export default function VerifyEmailScreen() {
-  const { userId, email } = useLocalSearchParams<{ userId: string; email: string }>();
+  const { userId, email, redirect } = useLocalSearchParams<{ userId: string; email: string; redirect?: string }>();
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [resendSuccess, setResendSuccess] = useState(false);
@@ -22,7 +22,7 @@ export default function VerifyEmailScreen() {
     mutationFn: () => verifyEmail({ userId, code }),
     onSuccess: async () => {
       await clearPendingUserId();
-      router.replace('/(auth)/login');
+      router.replace({ pathname: '/(auth)/login', params: redirect ? { redirect } : {} });
     },
     onError: (err) => {
       setError(getAxiosErrorMessage(err, 'Invalid or expired code. Please try again.'));

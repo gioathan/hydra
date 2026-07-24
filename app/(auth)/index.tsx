@@ -287,6 +287,14 @@ export default function SplashScreen() {
           >
             <Text style={styles.secondaryLabel}>Create Account</Text>
           </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [styles.browseBtn, pressed && styles.pressed]}
+            onPress={() => router.push('/(app)')}
+            hitSlop={8}
+          >
+            <Text style={styles.browseLabel}>Browse without an account</Text>
+          </Pressable>
         </View>
 
       </View>
@@ -370,6 +378,17 @@ const styles = StyleSheet.create({
   secondaryLabel: {
     ...T.buttonText,
     color: Colors.secondary,
+  },
+  browseBtn: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  browseLabel: {
+    ...T.bodyMd,
+    fontSize: 14,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: Colors.onSurfaceVariant,
   },
   pressed: {
     opacity: 0.82,

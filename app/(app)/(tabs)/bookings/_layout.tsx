@@ -1,7 +1,10 @@
 import { Stack } from 'expo-router';
+import { RequireAuth } from '../../../../components/RequireAuth';
 
 export default function BookingsLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }} />
+    <RequireAuth>
+      <Stack screenOptions={{ headerShown: false }} />
+    </RequireAuth>
   );
 }

@@ -9,6 +9,7 @@ import { Colors } from '../../../../constants/colors';
 import { T } from '../../../../constants/typography';
 import { rateVenue } from '../../../../lib/api/venues';
 import { getAxiosErrorMessage } from '../../../../lib/utils';
+import { RequireAuth } from '../../../../components/RequireAuth';
 
 const STARS = [1, 2, 3, 4, 5] as const;
 
@@ -21,6 +22,14 @@ const LABELS: Record<number, string> = {
 };
 
 export default function RateVenueScreen() {
+  return (
+    <RequireAuth>
+      <RateVenueScreenContent />
+    </RequireAuth>
+  );
+}
+
+function RateVenueScreenContent() {
   const { id, bookingId, venueName } = useLocalSearchParams<{
     id: string;
     bookingId: string;
