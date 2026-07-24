@@ -134,10 +134,10 @@ export default function VenueDetailScreen() {
               <MaterialIcons name="people" size={16} color={Colors.onSurfaceVariant} />
               <Text style={styles.metaText}>Up to {venue.capacity} guests</Text>
             </View>
-            {formatHourRange(venue.openHour, venue.closeHour) && (
+            {formatHourRange(venue.openHour, venue.closeHour, venue.openMinute, venue.closeMinute) && (
               <View style={styles.metaRow}>
                 <MaterialIcons name="schedule" size={16} color={Colors.onSurfaceVariant} />
-                <Text style={styles.metaText}>Open {formatHourRange(venue.openHour, venue.closeHour)}</Text>
+                <Text style={styles.metaText}>Open {formatHourRange(venue.openHour, venue.closeHour, venue.openMinute, venue.closeMinute)}</Text>
               </View>
             )}
             <StarRating rating={venue.averageRating} count={venue.ratingCount} size={15} />
@@ -226,6 +226,9 @@ export default function VenueDetailScreen() {
               {/* Date picker */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>SELECT A DATE</Text>
+                {!!venue.slotMinutes && (
+                  <Text style={styles.slotHint}>Reservations are {venue.slotMinutes}-minute slots</Text>
+                )}
                 <CalendarPicker
                   selectedDate={selectedDate}
                   onDateChange={setSelectedDate}
@@ -428,6 +431,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...T.labelCaps,
     color: Colors.onSurfaceVariant,
+  },
+  slotHint: {
+    ...T.bodyMd,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    opacity: 0.7,
+    marginTop: 4,
+    marginBottom: 8,
   },
   stepperRow: {
     flexDirection: 'row',
