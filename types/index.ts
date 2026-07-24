@@ -46,6 +46,8 @@ export interface VenueDto {
   pricingItems: PricingItemDto[];
   bookingsEnabled: boolean;
   eventsEnabled: boolean;
+  openHour: number | null;
+  closeHour: number | null;
 }
 
 export interface VenueEventPhotoDto {
@@ -135,6 +137,8 @@ export interface BookingDto {
   venueComment: string | null;
   createdAtUtc: string;
   updatedAtUtc: string;
+  customerName: string | null;
+  customerPhone: string | null;
 }
 
 export interface LoginRequest {
