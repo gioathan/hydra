@@ -37,7 +37,17 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     console.log(`[API] ERROR ${error.config?.url} — ${error.message}`);
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/google')) {
+    const hadToken = !!error.config?.headers?.Authorization;
+    if (
+      error.response?.status === 401 &&
+      hadToken &&
+      !error.config?.url?.includes('/auth/login') &&
+      !error.config?.url?.includes('/auth/google')
+    ) {
+      // Only treat this as "your session expired" when a token was actually sent.
+      // Discover/venues/events are browsable while logged out, so an anonymous
+      // request 401ing on some secondary/optional call must not force-navigate
+      // the user away from a page they're allowed to be on.
       useAuthStore.getState().clearAuth();
       await clearAll();
       router.replace('/(auth)');
