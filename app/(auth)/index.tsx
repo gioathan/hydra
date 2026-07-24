@@ -293,8 +293,11 @@ export default function SplashScreen() {
             onPress={() => router.push('/(app)')}
             hitSlop={8}
           >
-            <Text style={styles.browseLabel}>Browse without an account</Text>
+            <Text style={styles.browseLabel}>Just Looking? Explore Venues First</Text>
           </Pressable>
+          <Text style={styles.browseHint}>
+            No account needed to browse — you&apos;ll only need to sign in when you&apos;re ready to book.
+          </Text>
         </View>
 
       </View>
@@ -389,6 +392,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'PlusJakartaSans_700Bold',
     color: Colors.onSurfaceVariant,
+  },
+  browseHint: {
+    ...T.bodyMd,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    opacity: 0.7,
+    textAlign: 'center',
+    marginTop: -6,
+    paddingHorizontal: 8,
   },
   pressed: {
     opacity: 0.82,
