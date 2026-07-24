@@ -47,7 +47,10 @@ export interface VenueDto {
   bookingsEnabled: boolean;
   eventsEnabled: boolean;
   openHour: number | null;
+  openMinute: number | null;
   closeHour: number | null;
+  closeMinute: number | null;
+  slotMinutes: number | null;
 }
 
 export interface VenueEventPhotoDto {
