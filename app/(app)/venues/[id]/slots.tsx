@@ -14,9 +14,18 @@ import { T } from '../../../../constants/typography';
 import { TimeSlotChip } from '../../../../components/TimeSlotChip';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import { formatLocalDate } from '../../../../lib/utils';
+import { RequireAuth } from '../../../../components/RequireAuth';
 import type { AvailabilitySlot } from '../../../../types';
 
 export default function SlotsScreen() {
+  return (
+    <RequireAuth>
+      <SlotsScreenContent />
+    </RequireAuth>
+  );
+}
+
+function SlotsScreenContent() {
   const { id, date, partySize, slots, isAvailable, reason, venueName } =
     useLocalSearchParams<{
       id: string;

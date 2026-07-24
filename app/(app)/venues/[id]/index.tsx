@@ -25,9 +25,12 @@ import { StarRating } from '../../../../components/StarRating';
 import { getVenue, getAvailability, getVenueEvents } from '../../../../lib/api/venues';
 import { getVenueTypes } from '../../../../lib/api/venueTypes';
 import { formatDateParam } from '../../../../lib/utils';
+import { useAuthStore } from '../../../../lib/store/authStore';
+import { encodeRedirect } from '../../../../lib/authRedirect';
 
 export default function VenueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { token } = useAuthStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [partySize, setPartySize] = useState(2);
   const [checkingSlots, setCheckingSlots] = useState(false);
@@ -56,6 +59,13 @@ export default function VenueDetailScreen() {
 
   const handleSeeSlots = async () => {
     if (!venue) return;
+    if (!token) {
+      router.push({
+        pathname: '/(auth)/login',
+        params: { redirect: encodeRedirect(`/venues/${venue.id}`, {}) },
+      });
+      return;
+    }
     setCheckingSlots(true);
     setAvailabilityError(null);
     try {

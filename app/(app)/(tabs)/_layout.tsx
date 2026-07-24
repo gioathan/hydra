@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/colors';
+import { useAuthStore } from '../../../lib/store/authStore';
 
 type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
@@ -17,6 +18,8 @@ function TabIcon({ focused, label, icon }: { focused: boolean; label: string; ic
 }
 
 export default function TabsLayout() {
+  const { token } = useAuthStore();
+
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarStyle: styles.tabBar, tabBarShowLabel: false }}>
       <Tabs.Screen
@@ -34,13 +37,16 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="bookings"
         options={{
+          // Hidden from the tab bar entirely when logged out, rather than shown
+          // and just bouncing to login on tap.
+          href: token ? undefined : null,
           tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Bookings" icon="event-note" />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Profile" icon="person" />,
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label={token ? 'Profile' : 'Log In'} icon="person" />,
         }}
       />
     </Tabs>
